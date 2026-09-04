@@ -116,14 +116,6 @@ nav {
 .memory-name:focus {
     border-color: #a8937c;
 }
-.original-player {
-    width: 100%;
-    margin-bottom: 15px;
-    display: none;
-}
-.original-player audio {
-    width: 100%;
-}
 #waveform {
     width: 100%;
     margin: 20px 0;
@@ -313,14 +305,10 @@ footer {
 
         <input type="text" id="memoryName" class="memory-name" placeholder="Give this memory a name...">
 
-        <div id="originalPlayer" class="original-player">
-            <audio id="originalAudio" controls preload="metadata"></audio>
-        </div>
-
         <div id="waveform"></div>
 
         <div class="controls">
-            <button type="button" id="playPauseButton" disabled>Play Selection</button>
+            <button type="button" id="playButton" disabled>Play Selection</button>
             <button type="button" id="resetButton" disabled>Reset Selection</button>
             <button type="button" id="saveButton" disabled>Save Memory</button>
         </div>
@@ -343,24 +331,52 @@ footer {
 </footer>
 
 <script>
-let wavesurfer = null;
-let regionsPlugin = null;
+let wavesurfer;
+let regions;
 let selectedRegion = null;
-let currentAudioURL = null;
 let currentFile = null;
-let db = null;
-let memoryObjectURLs = [];
-let selectionPlaybackHandler = null;
+let db;
 
 const fileInput = document.getElementById("fileInput");
 const memoryName = document.getElementById("memoryName");
-const originalAudio = document.getElementById("originalAudio");
-const originalPlayer = document.getElementById("originalPlayer");
-const playPauseButton = document.getElementById("playPauseButton");
+const playButton = document.getElementById("playButton");
 const resetButton = document.getElementById("resetButton");
 const saveButton = document.getElementById("saveButton");
 const selectionInfo = document.getElementById("selectionInfo");
 const statusMessage = document.getElementById("statusMessage");
+const memoryList = document.getElementById("memoryList");
+
+function showStatus(message) {
+    statusMessage.textContent = message;
+}
+
+function formatTime(seconds) {
+    if (!isFinite(seconds) || seconds < 0) {
+        return "0:00";
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+
+    return minutes + ":" + String(secs).padStart(2, "0");
+}
+
+function formatDate(timestamp) {
+    return new Date(timestamp).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function escapeHTML(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 function openDatabase() {
     return new Promise((resolve, reject) => {
@@ -381,7 +397,7 @@ function openDatabase() {
 
         request.onsuccess = event => {
             db = event.target.result;
-            resolve(db);
+            resolve();
         };
 
         request.onerror = () => {
@@ -390,29 +406,19 @@ function openDatabase() {
     });
 }
 
-function addMemory(memory) {
+function saveToDatabase(memory) {
     return new Promise((resolve, reject) => {
-        if (!db) {
-            reject(new Error("Database is not ready."));
-            return;
-        }
-
         const transaction = db.transaction("memories", "readwrite");
         const store = transaction.objectStore("memories");
         const request = store.add(memory);
 
-        request.onsuccess = () => resolve(request.result);
+        request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
     });
 }
 
-function getMemories() {
+function getAllMemories() {
     return new Promise((resolve, reject) => {
-        if (!db) {
-            reject(new Error("Database is not ready."));
-            return;
-        }
-
         const transaction = db.transaction("memories", "readonly");
         const store = transaction.objectStore("memories");
         const request = store.getAll();
@@ -427,18 +433,7 @@ function getMemories() {
     });
 }
 
-function deleteMemoryFromDB(id) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction("memories", "readwrite");
-        const store = transaction.objectStore("memories");
-        const request = store.delete(id);
-
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-}
-
-function renameMemoryInDB(id, newName) {
+function updateMemory(id, name) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction("memories", "readwrite");
         const store = transaction.objectStore("memories");
@@ -452,7 +447,7 @@ function renameMemoryInDB(id, newName) {
                 return;
             }
 
-            memory.name = newName;
+            memory.name = name;
 
             const updateRequest = store.put(memory);
 
@@ -464,64 +459,73 @@ function renameMemoryInDB(id, newName) {
     });
 }
 
-function initializeWaveSurfer() {
-    try {
-        if (!window.WaveSurfer) {
-            throw new Error("WaveSurfer library did not load.");
-        }
+function deleteFromDatabase(id) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("memories", "readwrite");
+        const store = transaction.objectStore("memories");
+        const request = store.delete(id);
 
-        if (!window.WaveSurfer.Regions) {
-            throw new Error("WaveSurfer Regions plugin did not load.");
-        }
-
-        regionsPlugin = WaveSurfer.Regions.create();
-
-        wavesurfer = WaveSurfer.create({
-            container: "#waveform",
-            waveColor: "#b29b80",
-            progressColor: "#9b886e",
-            cursorColor: "#555",
-            height: 100,
-            normalize: true,
-            dragToSeek: true,
-            plugins: [regionsPlugin]
-        });
-
-        wavesurfer.on("ready", () => {
-            createDefaultRegion();
-            enableControls(true);
-            updateSelectionInfo();
-            showStatus("Audio loaded. Select the section you want to save.");
-        });
-
-        wavesurfer.on("error", error => {
-            console.error("WaveSurfer error:", error);
-            enableControls(false);
-            showStatus("Could not load this audio file.");
-        });
-
-        regionsPlugin.on("region-updated", region => {
-            selectedRegion = region;
-            updateSelectionInfo();
-        });
-
-        regionsPlugin.on("region-clicked", (region, event) => {
-            event.stopPropagation();
-            selectedRegion = region;
-            updateSelectionInfo();
-        });
-    } catch (error) {
-        console.error("WaveSurfer initialization error:", error);
-        showStatus("Audio editor could not be initialized. Please refresh the page.");
-    }
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
 }
 
-function createDefaultRegion() {
-    if (!wavesurfer || !regionsPlugin) {
-        return;
-    }
+function initializeWaveSurfer() {
+    regions = WaveSurfer.Regions.create();
 
-    regionsPlugin.clear();
+    wavesurfer = WaveSurfer.create({
+        container: "#waveform",
+        waveColor: "#b29b80",
+        progressColor: "#9b886e",
+        cursorColor: "#555",
+        height: 100,
+        normalize: true,
+        plugins: [regions]
+    });
+
+    wavesurfer.on("ready", () => {
+        createSelection();
+        playButton.disabled = false;
+        resetButton.disabled = false;
+        saveButton.disabled = false;
+        updateSelectionInfo();
+        showStatus("Audio loaded. Drag the selection to choose the part you want to keep.");
+    });
+
+    wavesurfer.on("error", error => {
+        console.error("WaveSurfer error:", error);
+        playButton.disabled = true;
+        resetButton.disabled = true;
+        saveButton.disabled = true;
+        showStatus("Unable to load this audio file.");
+    });
+
+    wavesurfer.on("finish", () => {
+        playButton.textContent = "Play Selection";
+    });
+
+    wavesurfer.on("play", () => {
+        playButton.textContent = "Pause";
+    });
+
+    wavesurfer.on("pause", () => {
+        playButton.textContent = "Play Selection";
+    });
+
+    regions.on("region-updated", region => {
+        selectedRegion = region;
+        updateSelectionInfo();
+    });
+
+    regions.on("region-clicked", (region, event) => {
+        event.stopPropagation();
+        selectedRegion = region;
+        updateSelectionInfo();
+    });
+}
+
+function createSelection() {
+    regions.clear();
 
     const duration = wavesurfer.getDuration();
 
@@ -529,7 +533,7 @@ function createDefaultRegion() {
         return;
     }
 
-    selectedRegion = regionsPlugin.addRegion({
+    selectedRegion = regions.addRegion({
         start: 0,
         end: duration,
         color: "rgba(155,136,110,0.22)",
@@ -540,6 +544,25 @@ function createDefaultRegion() {
     updateSelectionInfo();
 }
 
+function updateSelectionInfo() {
+    if (!selectedRegion) {
+        selectionInfo.textContent = "Upload an audio file to begin.";
+        return;
+    }
+
+    const start = selectedRegion.start;
+    const end = selectedRegion.end;
+
+    selectionInfo.textContent =
+        "Selected: " +
+        formatTime(start) +
+        " – " +
+        formatTime(end) +
+        " (" +
+        formatTime(end - start) +
+        ")";
+}
+
 fileInput.addEventListener("change", event => {
     const file = event.target.files[0];
 
@@ -548,203 +571,84 @@ fileInput.addEventListener("change", event => {
     }
 
     if (!file.type.startsWith("audio/")) {
-        showStatus("Please choose a valid audio file.");
-        fileInput.value = "";
+        showStatus("Please select a valid audio file.");
         return;
     }
 
     currentFile = file;
 
     if (wavesurfer) {
-        wavesurfer.pause();
+        wavesurfer.stop();
     }
 
-    stopNativeSelectionPlayback();
+    selectedRegion = null;
 
-    if (currentAudioURL) {
-        URL.revokeObjectURL(currentAudioURL);
-    }
-
-    currentAudioURL = URL.createObjectURL(file);
+    playButton.disabled = true;
+    resetButton.disabled = true;
+    saveButton.disabled = true;
 
     memoryName.value = file.name.replace(/\.[^/.]+$/, "");
 
-    originalAudio.pause();
-    originalAudio.src = currentAudioURL;
-    originalAudio.load();
-    originalPlayer.style.display = "block";
-
-    enableControls(false);
-    selectedRegion = null;
-
-    if (regionsPlugin) {
-        regionsPlugin.clear();
-    }
-
     showStatus("Loading audio...");
 
-    try {
-        wavesurfer.load(currentAudioURL);
-    } catch (error) {
-        console.error("Audio loading error:", error);
-        showStatus("Could not load this audio file.");
-    }
+    wavesurfer.loadBlob(file);
 });
 
-playPauseButton.addEventListener("click", playSelection);
-resetButton.addEventListener("click", resetSelection);
-saveButton.addEventListener("click", saveMemory);
-
-function playSelection() {
-    if (!currentAudioURL || !selectedRegion) {
-        showStatus("Please upload an audio file and select a section first.");
-        return;
-    }
-
-    const start = selectedRegion.start;
-    const end = selectedRegion.end;
-
-    if (!isFinite(start) || !isFinite(end) || end <= start) {
-        showStatus("Please select a valid portion of the audio.");
-        return;
-    }
-
-    if (!originalAudio.src) {
-        showStatus("Audio is not available for playback.");
-        return;
-    }
-
-    if (!originalAudio.paused) {
-        originalAudio.pause();
-        playPauseButton.textContent = "Play Selection";
-        return;
-    }
-
-    stopNativeSelectionPlayback();
-
-    try {
-        originalAudio.currentTime = start;
-
-        selectionPlaybackHandler = () => {
-            if (originalAudio.currentTime >= end) {
-                originalAudio.pause();
-                originalAudio.currentTime = start;
-                playPauseButton.textContent = "Play Selection";
-                stopNativeSelectionPlayback();
-            }
-        };
-
-        originalAudio.addEventListener("timeupdate", selectionPlaybackHandler);
-
-        const playPromise = originalAudio.play();
-
-        if (playPromise) {
-            playPromise
-                .then(() => {
-                    playPauseButton.textContent = "Pause";
-                    showStatus("Playing selected section.");
-                })
-                .catch(error => {
-                    console.error("Playback error:", error);
-                    stopNativeSelectionPlayback();
-                    playPauseButton.textContent = "Play Selection";
-                    showStatus("Could not play this audio. Try the player above.");
-                });
-        }
-    } catch (error) {
-        console.error("Selection playback error:", error);
-        showStatus("Could not play the selected section.");
-    }
-}
-
-function stopNativeSelectionPlayback() {
-    if (selectionPlaybackHandler) {
-        originalAudio.removeEventListener("timeupdate", selectionPlaybackHandler);
-        selectionPlaybackHandler = null;
-    }
-}
-
-originalAudio.addEventListener("pause", () => {
-    if (!selectionPlaybackHandler) {
-        playPauseButton.textContent = "Play Selection";
-    }
-});
-
-function resetSelection() {
-    if (!wavesurfer || !currentAudioURL) {
+playButton.addEventListener("click", () => {
+    if (!wavesurfer || !selectedRegion) {
         showStatus("Please upload an audio file first.");
         return;
     }
 
-    stopNativeSelectionPlayback();
-    originalAudio.pause();
+    if (wavesurfer.isPlaying()) {
+        wavesurfer.pause();
+        return;
+    }
 
-    createDefaultRegion();
+    wavesurfer.play(
+        selectedRegion.start,
+        selectedRegion.end
+    );
+});
 
-    playPauseButton.textContent = "Play Selection";
+resetButton.addEventListener("click", () => {
+    if (!wavesurfer || !currentFile) {
+        showStatus("Please upload an audio file first.");
+        return;
+    }
 
+    wavesurfer.pause();
+    createSelection();
+    playButton.textContent = "Play Selection";
     showStatus("Selection reset to the complete recording.");
-}
+});
 
-function updateSelectionInfo() {
-    if (!wavesurfer || !selectedRegion) {
-        selectionInfo.textContent = "Upload an audio file to begin.";
-        return;
-    }
-
-    const start = selectedRegion.start;
-    const end = selectedRegion.end;
-    const duration = end - start;
-
-    selectionInfo.textContent =
-        "Selected: " +
-        formatTime(start) +
-        " – " +
-        formatTime(end) +
-        " (" +
-        formatTime(duration) +
-        ")";
-}
-
-function enableControls(enabled) {
-    playPauseButton.disabled = !enabled;
-    resetButton.disabled = !enabled;
-    saveButton.disabled = !enabled;
-}
-
-async function saveMemory() {
-    if (!currentAudioURL || !currentFile || !wavesurfer || !selectedRegion) {
-        showStatus("Please upload an audio file and select a section first.");
+saveButton.addEventListener("click", async () => {
+    if (!currentFile || !selectedRegion) {
+        showStatus("Please upload an audio file and select a section.");
         return;
     }
 
     const start = selectedRegion.start;
     const end = selectedRegion.end;
 
-    if (!isFinite(start) || !isFinite(end) || end <= start || end - start < 0.1) {
+    if (end <= start || end - start < 0.1) {
         showStatus("Please select a valid portion of the audio.");
         return;
     }
 
-    let name = memoryName.value.trim();
-
-    if (!name) {
-        name = "Voice Memory";
-    }
+    const name = memoryName.value.trim() || "Voice Memory";
 
     saveButton.disabled = true;
-    playPauseButton.disabled = true;
+    playButton.disabled = true;
     resetButton.disabled = true;
     saveButton.textContent = "Saving...";
     showStatus("Creating trimmed audio...");
 
     try {
-        stopNativeSelectionPlayback();
-        originalAudio.pause();
+        const trimmedAudio = await trimAudio(currentFile, start, end);
 
-        const trimmedAudio = await createTrimmedAudio(currentFile, start, end);
-
-        await addMemory({
+        await saveToDatabase({
             name: name,
             audio: trimmedAudio,
             duration: end - start,
@@ -756,19 +660,20 @@ async function saveMemory() {
         showStatus("Memory saved successfully.");
     } catch (error) {
         console.error("Save error:", error);
-        showStatus("Could not save the audio. Please try another file.");
-    } finally {
-        saveButton.disabled = false;
-        playPauseButton.disabled = false;
-        resetButton.disabled = false;
-        saveButton.textContent = "Save Memory";
+        showStatus("Could not save the selected audio.");
     }
-}
 
-async function createTrimmedAudio(file, startTime, endTime) {
+    saveButton.disabled = false;
+    playButton.disabled = false;
+    resetButton.disabled = false;
+    saveButton.textContent = "Save Memory";
+});
+
+async function trimAudio(file, startTime, endTime) {
     const arrayBuffer = await file.arrayBuffer();
 
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
 
     if (!AudioContextClass) {
         throw new Error("Web Audio API is not supported.");
@@ -777,16 +682,14 @@ async function createTrimmedAudio(file, startTime, endTime) {
     const audioContext = new AudioContextClass();
 
     try {
-        const originalBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        const sampleRate = originalBuffer.sampleRate;
+        const audioBuffer =
+            await audioContext.decodeAudioData(arrayBuffer);
 
-        const startSample = Math.max(
-            0,
-            Math.floor(startTime * sampleRate)
-        );
+        const sampleRate = audioBuffer.sampleRate;
 
+        const startSample = Math.floor(startTime * sampleRate);
         const endSample = Math.min(
-            originalBuffer.length,
+            audioBuffer.length,
             Math.floor(endTime * sampleRate)
         );
 
@@ -797,40 +700,37 @@ async function createTrimmedAudio(file, startTime, endTime) {
         }
 
         const trimmedBuffer = audioContext.createBuffer(
-            originalBuffer.numberOfChannels,
+            audioBuffer.numberOfChannels,
             frameCount,
             sampleRate
         );
 
         for (
             let channel = 0;
-            channel < originalBuffer.numberOfChannels;
+            channel < audioBuffer.numberOfChannels;
             channel++
         ) {
-            const sourceData = originalBuffer.getChannelData(channel);
-            const destinationData = trimmedBuffer.getChannelData(channel);
+            const source = audioBuffer.getChannelData(channel);
+            const destination = trimmedBuffer.getChannelData(channel);
 
-            destinationData.set(
-                sourceData.slice(startSample, endSample)
+            destination.set(
+                source.slice(startSample, endSample)
             );
         }
 
-        return audioBufferToWav(trimmedBuffer);
+        return convertToWav(trimmedBuffer);
     } finally {
-        try {
-            await audioContext.close();
-        } catch (error) {
-            console.warn("AudioContext close warning:", error);
-        }
+        await audioContext.close();
     }
 }
 
-function audioBufferToWav(buffer) {
-    const numberOfChannels = buffer.numberOfChannels;
+function convertToWav(buffer) {
+    const channels = buffer.numberOfChannels;
     const sampleRate = buffer.sampleRate;
-    const bitDepth = 16;
-    const bytesPerSample = bitDepth / 8;
-    const dataLength = buffer.length * numberOfChannels * bytesPerSample;
+    const bytesPerSample = 2;
+    const dataLength =
+        buffer.length * channels * bytesPerSample;
+
     const arrayBuffer = new ArrayBuffer(44 + dataLength);
     const view = new DataView(arrayBuffer);
 
@@ -840,37 +740,35 @@ function audioBufferToWav(buffer) {
     writeString(view, 12, "fmt ");
     view.setUint32(16, 16, true);
     view.setUint16(20, 1, true);
-    view.setUint16(22, numberOfChannels, true);
+    view.setUint16(22, channels, true);
     view.setUint32(24, sampleRate, true);
     view.setUint32(
         28,
-        sampleRate * numberOfChannels * bytesPerSample,
+        sampleRate * channels * bytesPerSample,
         true
     );
     view.setUint16(
         32,
-        numberOfChannels * bytesPerSample,
+        channels * bytesPerSample,
         true
     );
-    view.setUint16(34, bitDepth, true);
+    view.setUint16(34, 16, true);
     writeString(view, 36, "data");
     view.setUint32(40, dataLength, true);
 
     let offset = 44;
 
     for (let i = 0; i < buffer.length; i++) {
-        for (
-            let channel = 0;
-            channel < numberOfChannels;
-            channel++
-        ) {
-            let sample = buffer.getChannelData(channel)[i];
+        for (let channel = 0; channel < channels; channel++) {
+            let sample =
+                buffer.getChannelData(channel)[i];
 
             sample = Math.max(-1, Math.min(1, sample));
 
-            const value = sample < 0
-                ? sample * 0x8000
-                : sample * 0x7fff;
+            const value =
+                sample < 0
+                    ? sample * 0x8000
+                    : sample * 0x7fff;
 
             view.setInt16(offset, value, true);
             offset += 2;
@@ -892,20 +790,12 @@ function writeString(view, offset, string) {
 }
 
 async function displayMemories() {
-    const list = document.getElementById("memoryList");
+    const memories = await getAllMemories();
 
-    list.innerHTML = "";
-
-    memoryObjectURLs.forEach(url => {
-        URL.revokeObjectURL(url);
-    });
-
-    memoryObjectURLs = [];
-
-    const memories = await getMemories();
+    memoryList.innerHTML = "";
 
     if (!memories.length) {
-        list.innerHTML = `
+        memoryList.innerHTML = `
             <div class="empty-state">
                 No saved memories yet.<br>
                 Upload a recording, select a section,
@@ -919,126 +809,91 @@ async function displayMemories() {
         const item = document.createElement("div");
         item.className = "memory-item";
 
-        const audioURL = URL.createObjectURL(memory.audio);
-        memoryObjectURLs.push(audioURL);
+        const top = document.createElement("div");
+        top.className = "memory-item-top";
 
-        item.innerHTML = `
-            <div class="memory-item-top">
-                <div class="memory-info">
-                    <h3>${escapeHTML(memory.name)}</h3>
-                    <span>
-                        ${formatTime(memory.duration)}
-                        &nbsp; • &nbsp;
-                        ${formatDate(memory.createdAt)}
-                    </span>
-                </div>
-                <div class="memory-actions">
-                    <button type="button" data-action="rename">Rename</button>
-                    <button type="button" class="delete-btn" data-action="delete">Delete</button>
-                </div>
-            </div>
-            <audio controls preload="metadata"></audio>
-        `;
+        const info = document.createElement("div");
+        info.className = "memory-info";
 
-        const audio = item.querySelector("audio");
-        audio.src = audioURL;
+        const title = document.createElement("h3");
+        title.textContent = memory.name;
 
-        item.querySelector('[data-action="rename"]').addEventListener(
-            "click",
-            () => renameMemory(memory.id)
-        );
+        const details = document.createElement("span");
+        details.textContent =
+            formatTime(memory.duration) +
+            " • " +
+            formatDate(memory.createdAt);
 
-        item.querySelector('[data-action="delete"]').addEventListener(
-            "click",
-            () => deleteMemory(memory.id)
-        );
+        info.appendChild(title);
+        info.appendChild(details);
 
-        list.appendChild(item);
+        const actions = document.createElement("div");
+        actions.className = "memory-actions";
+
+        const renameButton = document.createElement("button");
+        renameButton.type = "button";
+        renameButton.textContent = "Rename";
+
+        renameButton.addEventListener("click", async () => {
+            const newName = prompt(
+                "Enter a new name:",
+                memory.name
+            );
+
+            if (!newName || !newName.trim()) {
+                return;
+            }
+
+            try {
+                await updateMemory(
+                    memory.id,
+                    newName.trim()
+                );
+
+                await displayMemories();
+                showStatus("Memory renamed.");
+            } catch (error) {
+                console.error(error);
+                showStatus("Could not rename the memory.");
+            }
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete-btn";
+
+        deleteButton.addEventListener("click", async () => {
+            if (!confirm("Delete this saved memory?")) {
+                return;
+            }
+
+            try {
+                await deleteFromDatabase(memory.id);
+                await displayMemories();
+                showStatus("Memory deleted.");
+            } catch (error) {
+                console.error(error);
+                showStatus("Could not delete the memory.");
+            }
+        });
+
+        actions.appendChild(renameButton);
+        actions.appendChild(deleteButton);
+
+        top.appendChild(info);
+        top.appendChild(actions);
+
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.preload = "metadata";
+        audio.src = URL.createObjectURL(memory.audio);
+
+        item.appendChild(top);
+        item.appendChild(audio);
+
+        memoryList.appendChild(item);
     });
-}
-
-async function renameMemory(id) {
-    const memories = await getMemories();
-
-    const memory = memories.find(item => item.id === id);
-
-    if (!memory) {
-        return;
-    }
-
-    const newName = prompt(
-        "Enter a new name:",
-        memory.name
-    );
-
-    if (newName === null || !newName.trim()) {
-        return;
-    }
-
-    try {
-        await renameMemoryInDB(id, newName.trim());
-        await displayMemories();
-        showStatus("Memory renamed.");
-    } catch (error) {
-        console.error(error);
-        showStatus("Could not rename the memory.");
-    }
-}
-
-async function deleteMemory(id) {
-    const confirmed = confirm("Delete this saved memory?");
-
-    if (!confirmed) {
-        return;
-    }
-
-    try {
-        await deleteMemoryFromDB(id);
-        await displayMemories();
-        showStatus("Memory deleted.");
-    } catch (error) {
-        console.error(error);
-        showStatus("Could not delete the memory.");
-    }
-}
-
-function formatTime(seconds) {
-    if (!isFinite(seconds) || seconds < 0) {
-        return "0:00";
-    }
-
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-
-    return (
-        minutes +
-        ":" +
-        String(remainingSeconds).padStart(2, "0")
-    );
-}
-
-function formatDate(timestamp) {
-    return new Date(timestamp).toLocaleDateString(
-        undefined,
-        {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
-    );
-}
-
-function escapeHTML(value) {
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function showStatus(message) {
-    statusMessage.textContent = message;
 }
 
 async function initialize() {
@@ -1048,32 +903,11 @@ async function initialize() {
         await displayMemories();
     } catch (error) {
         console.error("Initialization error:", error);
-
-        document.getElementById("memoryList").innerHTML = `
-            <div class="empty-state">
-                Unable to load saved memories.
-            </div>
-        `;
+        showStatus("Could not initialize Voice Memories.");
     }
 }
 
 initialize();
-
-window.addEventListener("beforeunload", () => {
-    stopNativeSelectionPlayback();
-
-    if (wavesurfer) {
-        wavesurfer.destroy();
-    }
-
-    if (currentAudioURL) {
-        URL.revokeObjectURL(currentAudioURL);
-    }
-
-    memoryObjectURLs.forEach(url => {
-        URL.revokeObjectURL(url);
-    });
-});
 </script>
 </body>
 </html>
