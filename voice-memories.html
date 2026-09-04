@@ -1,19 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>MindEase - Voice Memories</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
-<!-- WaveSurfer v7 -->
+
+<!-- WaveSurfer -->
+
 <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+
 <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
 
+
 <style>
+
+/* =====================================================
+   GENERAL
+===================================================== */
 
 * {
     box-sizing: border-box;
@@ -26,18 +37,26 @@ body {
     color: #4d443b;
 }
 
-/* NAVBAR */
+
+/* =====================================================
+   NAVBAR
+===================================================== */
 
 nav {
     width: 100%;
     padding: 18px 50px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     background: rgba(255,255,255,0.55);
+
     backdrop-filter: blur(10px);
+
     position: sticky;
     top: 0;
+
     z-index: 100;
 }
 
@@ -45,9 +64,10 @@ nav {
 .logo:visited,
 .logo:hover,
 .logo:active {
-  color: inherit;
-  text-decoration: none;
-  font-weight:600; font-size:22px;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 22px;
 }
 
 .nav-links {
@@ -65,7 +85,10 @@ nav {
     color: #8f7b65;
 }
 
-/* MAIN */
+
+/* =====================================================
+   MAIN
+===================================================== */
 
 .container {
     width: 90%;
@@ -73,7 +96,10 @@ nav {
     margin: 50px auto;
 }
 
-/* HEADER */
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 .header {
     text-align: center;
@@ -91,23 +117,38 @@ nav {
     color: #75695d;
 }
 
-/* CARD */
+
+/* =====================================================
+   CARD
+===================================================== */
 
 .voice-card {
     background: rgba(255,255,255,0.72);
+
     border-radius: 18px;
+
     padding: 30px;
-    box-shadow: 0 8px 30px rgba(80,65,50,0.08);
+
+    box-shadow:
+        0 8px 30px rgba(80,65,50,0.08);
+
     margin-bottom: 35px;
 }
 
-/* UPLOAD */
+
+/* =====================================================
+   UPLOAD AREA
+===================================================== */
 
 .upload-area {
     text-align: center;
+
     padding: 30px;
+
     border: 2px dashed #c5b5a3;
+
     border-radius: 15px;
+
     margin-bottom: 25px;
 }
 
@@ -118,11 +159,17 @@ nav {
 
 .upload-label {
     display: inline-block;
+
     padding: 10px 22px;
+
     background: #a8937c;
+
     color: white;
+
     border-radius: 9px;
+
     cursor: pointer;
+
     font-size: 14px;
 }
 
@@ -134,17 +181,28 @@ nav {
     display: none;
 }
 
-/* NAME */
+
+/* =====================================================
+   MEMORY NAME
+===================================================== */
 
 .memory-name {
     width: 100%;
+
     padding: 12px 14px;
+
     border: 1px solid #d4c6b6;
+
     border-radius: 9px;
+
     background: #fffaf5;
+
     font-family: inherit;
+
     color: #51483f;
+
     outline: none;
+
     margin-bottom: 20px;
 }
 
@@ -152,33 +210,72 @@ nav {
     border-color: #a8937c;
 }
 
-/* WAVEFORM */
+
+/* =====================================================
+   ORIGINAL AUDIO PLAYER
+===================================================== */
+
+.original-player {
+    width: 100%;
+
+    margin-bottom: 15px;
+
+    display: none;
+}
+
+.original-player audio {
+    width: 100%;
+}
+
+
+/* =====================================================
+   WAVEFORM
+===================================================== */
 
 #waveform {
     width: 100%;
+
     margin: 20px 0;
+
     background: #f8f3ed;
+
     border-radius: 10px;
+
     padding: 10px;
+
+    min-height: 120px;
 }
 
-/* CONTROLS */
+
+/* =====================================================
+   CONTROLS
+===================================================== */
 
 .controls {
     display: flex;
+
     justify-content: center;
+
     gap: 10px;
+
     flex-wrap: wrap;
+
     margin-top: 20px;
 }
 
 .controls button {
     border: none;
+
     padding: 10px 18px;
+
     border-radius: 9px;
+
     background: #a8937c;
+
     color: white;
+
     font-family: inherit;
+
     cursor: pointer;
 }
 
@@ -188,27 +285,41 @@ nav {
 
 .controls button:disabled {
     opacity: 0.5;
+
     cursor: not-allowed;
 }
 
 .selection-info {
     text-align: center;
+
     font-size: 13px;
+
     color: #796e63;
+
     margin-top: 15px;
 }
 
-/* STATUS */
+
+/* =====================================================
+   STATUS
+===================================================== */
 
 .status-message {
     text-align: center;
+
     font-size: 13px;
+
     margin-top: 15px;
+
     min-height: 20px;
+
     color: #786d62;
 }
 
-/* SAVED MEMORIES */
+
+/* =====================================================
+   SAVED MEMORIES
+===================================================== */
 
 .saved-title {
     margin-bottom: 20px;
@@ -216,38 +327,57 @@ nav {
 
 .saved-title h2 {
     margin: 0;
+
     font-size: 23px;
+
     color: #4d443b;
 }
 
 .saved-title p {
     margin-top: 5px;
+
     font-size: 13px;
+
     color: #786d62;
 }
 
-/* MEMORY LIST */
+
+/* =====================================================
+   MEMORY LIST
+===================================================== */
 
 .memory-list {
     display: flex;
+
     flex-direction: column;
+
     gap: 15px;
 }
 
-/* MEMORY ITEM */
+
+/* =====================================================
+   MEMORY ITEM
+===================================================== */
 
 .memory-item {
     background: #fffaf5;
+
     border: 1px solid #ded2c5;
+
     border-radius: 14px;
+
     padding: 18px;
 }
 
 .memory-item-top {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     gap: 15px;
+
     margin-bottom: 12px;
 }
 
@@ -257,39 +387,67 @@ nav {
 
 .memory-info h3 {
     margin: 0;
+
     font-size: 15px;
+
     font-weight: 600;
+
     color: #51483f;
+
     word-break: break-word;
 }
 
 .memory-info span {
     display: block;
+
     font-size: 12px;
+
     color: #877b6e;
+
     margin-top: 4px;
 }
 
+
+/* =====================================================
+   SAVED AUDIO PLAYER
+===================================================== */
+
 .memory-item audio {
     width: 100%;
+
     height: 40px;
+
     margin-top: 5px;
 }
 
+
+/* =====================================================
+   MEMORY ACTIONS
+===================================================== */
+
 .memory-actions {
     display: flex;
+
     gap: 7px;
+
     flex-shrink: 0;
 }
 
 .memory-actions button {
     border: none;
+
     padding: 7px 11px;
+
     border-radius: 7px;
+
     background: #d5c5b4;
+
     color: #51483f;
+
     font-family: inherit;
+
     font-size: 12px;
+
     cursor: pointer;
 }
 
@@ -305,25 +463,44 @@ nav {
     background: #c99f94;
 }
 
-/* EMPTY */
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
 
 .empty-state {
     text-align: center;
+
     padding: 35px 20px;
+
     color: #81766b;
+
     font-size: 14px;
+
     background: rgba(255,255,255,0.4);
+
     border-radius: 12px;
 }
 
-/* FOOTER */
+
+/* =====================================================
+   FOOTER
+===================================================== */
 
 footer {
     text-align: center;
+
     padding: 30px;
+
     font-size: 12px;
+
     color: #81766b;
 }
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
 
 @media(max-width:700px) {
 
@@ -349,6 +526,7 @@ footer {
 
     .memory-item-top {
         flex-direction: column;
+
         align-items: flex-start;
     }
 
@@ -359,32 +537,66 @@ footer {
     .memory-actions button {
         flex: 1;
     }
+
 }
 
 </style>
+
 </head>
+
 
 <body>
 
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
 <nav>
 
-    <a href="index.html" class="logo">MindEase</a>
+    <a href="index.html" class="logo">
+        MindEase
+    </a>
+
 
     <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="journal.html">Journal</a>
-        <a href="doodle.html">Doodle</a>
-        <a href="relaxation.html">Relaxation</a>
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="journal.html">
+            Journal
+        </a>
+
+        <a href="doodle.html">
+            Doodle
+        </a>
+
+        <a href="relaxation.html">
+            Relaxation
+        </a>
+
     </div>
 
 </nav>
 
 
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <div class="container">
+
+
+    <!-- HEADER -->
 
     <div class="header">
 
-        <h1>Voice Memories</h1>
+        <h1>
+            Voice Memories
+        </h1>
 
         <p>
             Save meaningful voice recordings and keep the moments that matter.
@@ -393,9 +605,15 @@ footer {
     </div>
 
 
-    <!-- AUDIO EDITOR -->
+
+    <!-- =================================================
+         AUDIO EDITOR
+    ================================================= -->
 
     <div class="voice-card">
+
+
+        <!-- UPLOAD -->
 
         <div class="upload-area">
 
@@ -403,9 +621,14 @@ footer {
                 Upload a voice recording and select the part you want to keep.
             </p>
 
-            <label for="fileInput" class="upload-label">
+
+            <label
+                for="fileInput"
+                class="upload-label"
+            >
                 Choose Audio
             </label>
+
 
             <input
                 type="file"
@@ -416,6 +639,9 @@ footer {
         </div>
 
 
+
+        <!-- NAME -->
+
         <input
             type="text"
             id="memoryName"
@@ -424,25 +650,66 @@ footer {
         >
 
 
-        <div id="waveform"></div>
 
+        <!-- ORIGINAL AUDIO -->
 
-        <div class="controls">
+        <div
+            id="originalPlayer"
+            class="original-player"
+        >
 
-            <button id="playPauseButton" onclick="playPause()" disabled>
-                Play Selection
-            </button>
-
-            <button onclick="resetSelection()" disabled id="resetButton">
-                Reset Selection
-            </button>
-
-            <button onclick="saveMemory()" disabled id="saveButton">
-                Save Memory
-            </button>
+            <audio
+                id="originalAudio"
+                controls
+            ></audio>
 
         </div>
 
+
+
+        <!-- WAVEFORM -->
+
+        <div id="waveform"></div>
+
+
+
+        <!-- CONTROLS -->
+
+        <div class="controls">
+
+
+            <button
+                id="playPauseButton"
+                onclick="playSelection()"
+                disabled
+            >
+                Play Selection
+            </button>
+
+
+            <button
+                id="resetButton"
+                onclick="resetSelection()"
+                disabled
+            >
+                Reset Selection
+            </button>
+
+
+            <button
+                id="saveButton"
+                onclick="saveMemory()"
+                disabled
+            >
+                Save Memory
+            </button>
+
+
+        </div>
+
+
+
+        <!-- SELECTION INFO -->
 
         <div
             id="selectionInfo"
@@ -452,21 +719,32 @@ footer {
         </div>
 
 
+
+        <!-- STATUS -->
+
         <div
             id="statusMessage"
             class="status-message"
         ></div>
 
+
     </div>
 
 
-    <!-- SAVED MEMORIES -->
+
+    <!-- =================================================
+         SAVED MEMORIES
+    ================================================= -->
 
     <div class="voice-card">
 
+
         <div class="saved-title">
 
-            <h2>Saved & Trimmed Memories</h2>
+            <h2>
+                Saved & Trimmed Memories
+            </h2>
+
 
             <p>
                 Your saved voice memories will appear here.
@@ -475,25 +753,45 @@ footer {
         </div>
 
 
+
         <div
             id="memoryList"
             class="memory-list"
         ></div>
 
+
     </div>
+
 
 </div>
 
 
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
-    <p>&copy; 2026 MindEase. Designed for Better Mindfulness.</p>
+
+    <p>
+        &copy; 2026 MindEase. Designed for Better Mindfulness.
+    </p>
+
 </footer>
+
 
 
 <script>
 
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
 let wavesurfer = null;
+
 let regionsPlugin = null;
+
 let selectedRegion = null;
 
 let currentAudioURL = null;
@@ -503,248 +801,356 @@ let db = null;
 let memoryObjectURLs = [];
 
 
-// =====================================================
-// DATABASE
-// =====================================================
+
+/* =====================================================
+   DATABASE
+===================================================== */
 
 function openDatabase() {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(
+        function(resolve, reject) {
 
-        const request = indexedDB.open("MindEaseVoiceMemories", 1);
+            const request =
+                indexedDB.open(
+                    "MindEaseVoiceMemories",
+                    1
+                );
 
 
-        request.onupgradeneeded = function(event) {
+            request.onupgradeneeded =
+                function(event) {
 
-            const database = event.target.result;
+                    const database =
+                        event.target.result;
 
-            if (!database.objectStoreNames.contains("memories")) {
 
-                const store = database.createObjectStore(
-                    "memories",
-                    {
-                        keyPath: "id",
-                        autoIncrement: true
+                    if (
+                        !database.objectStoreNames.contains(
+                            "memories"
+                        )
+                    ) {
+
+                        const store =
+                            database.createObjectStore(
+                                "memories",
+                                {
+                                    keyPath: "id",
+                                    autoIncrement: true
+                                }
+                            );
+
+
+                        store.createIndex(
+                            "createdAt",
+                            "createdAt"
+                        );
+
                     }
-                );
 
-                store.createIndex(
-                    "createdAt",
-                    "createdAt"
-                );
-
-            }
-
-        };
+                };
 
 
-        request.onsuccess = function(event) {
+            request.onsuccess =
+                function(event) {
 
-            db = event.target.result;
+                    db =
+                        event.target.result;
 
-            resolve(db);
+                    resolve(db);
 
-        };
+                };
 
 
-        request.onerror = function() {
+            request.onerror =
+                function() {
 
-            reject(request.error);
+                    reject(
+                        request.error
+                    );
 
-        };
+                };
 
-    });
+        }
+    );
 
 }
 
 
-// =====================================================
-// SAVE DATABASE
-// =====================================================
+
+/* =====================================================
+   ADD MEMORY
+===================================================== */
 
 function addMemory(memory) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(
+        function(resolve, reject) {
 
-        const transaction =
-            db.transaction(["memories"], "readwrite");
-
-        const store =
-            transaction.objectStore("memories");
-
-        const request =
-            store.add(memory);
+            const transaction =
+                db.transaction(
+                    "memories",
+                    "readwrite"
+                );
 
 
-        request.onsuccess = function() {
+            const store =
+                transaction.objectStore(
+                    "memories"
+                );
 
-            resolve(request.result);
 
-        };
+            const request =
+                store.add(memory);
 
 
-        request.onerror = function() {
+            request.onsuccess =
+                function() {
 
-            reject(request.error);
+                    resolve(
+                        request.result
+                    );
 
-        };
+                };
 
-    });
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
 
 }
 
 
-// =====================================================
-// GET ALL MEMORIES
-// =====================================================
+
+/* =====================================================
+   GET MEMORIES
+===================================================== */
 
 function getMemories() {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(
+        function(resolve, reject) {
 
-        const transaction =
-            db.transaction(["memories"], "readonly");
-
-        const store =
-            transaction.objectStore("memories");
-
-        const request =
-            store.getAll();
+            const transaction =
+                db.transaction(
+                    "memories",
+                    "readonly"
+                );
 
 
-        request.onsuccess = function() {
-
-            const memories = request.result || [];
-
-            memories.sort(
-                (a, b) => b.createdAt - a.createdAt
-            );
-
-            resolve(memories);
-
-        };
+            const store =
+                transaction.objectStore(
+                    "memories"
+                );
 
 
-        request.onerror = function() {
+            const request =
+                store.getAll();
 
-            reject(request.error);
 
-        };
+            request.onsuccess =
+                function() {
 
-    });
+                    const memories =
+                        request.result || [];
+
+
+                    memories.sort(
+                        function(a, b) {
+
+                            return (
+                                b.createdAt -
+                                a.createdAt
+                            );
+
+                        }
+                    );
+
+
+                    resolve(
+                        memories
+                    );
+
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
 
 }
 
 
-// =====================================================
-// DELETE
-// =====================================================
+
+/* =====================================================
+   DELETE MEMORY
+===================================================== */
 
 function deleteMemoryFromDB(id) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(
+        function(resolve, reject) {
 
-        const transaction =
-            db.transaction(["memories"], "readwrite");
-
-        const store =
-            transaction.objectStore("memories");
-
-        const request =
-            store.delete(id);
+            const transaction =
+                db.transaction(
+                    "memories",
+                    "readwrite"
+                );
 
 
-        request.onsuccess = function() {
-
-            resolve();
-
-        };
-
-
-        request.onerror = function() {
-
-            reject(request.error);
-
-        };
-
-    });
-
-}
+            const store =
+                transaction.objectStore(
+                    "memories"
+                );
 
 
-// =====================================================
-// RENAME
-// =====================================================
-
-function renameMemoryInDB(id, newName) {
-
-    return new Promise((resolve, reject) => {
-
-        const transaction =
-            db.transaction(["memories"], "readwrite");
-
-        const store =
-            transaction.objectStore("memories");
-
-        const request =
-            store.get(id);
+            const request =
+                store.delete(id);
 
 
-        request.onsuccess = function() {
+            request.onsuccess =
+                function() {
 
-            const memory = request.result;
+                    resolve();
 
-            if (!memory) {
-
-                reject(new Error("Memory not found."));
-
-                return;
-
-            }
+                };
 
 
-            memory.name = newName;
+            request.onerror =
+                function() {
 
+                    reject(
+                        request.error
+                    );
 
-            const updateRequest =
-                store.put(memory);
+                };
 
-
-            updateRequest.onsuccess = function() {
-
-                resolve();
-
-            };
-
-
-            updateRequest.onerror = function() {
-
-                reject(updateRequest.error);
-
-            };
-
-        };
-
-
-        request.onerror = function() {
-
-            reject(request.error);
-
-        };
-
-    });
+        }
+    );
 
 }
 
 
-// =====================================================
-// WAVESURFER
-// =====================================================
+
+/* =====================================================
+   RENAME MEMORY
+===================================================== */
+
+function renameMemoryInDB(
+    id,
+    newName
+) {
+
+    return new Promise(
+        function(resolve, reject) {
+
+            const transaction =
+                db.transaction(
+                    "memories",
+                    "readwrite"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    "memories"
+                );
+
+
+            const request =
+                store.get(id);
+
+
+            request.onsuccess =
+                function() {
+
+                    const memory =
+                        request.result;
+
+
+                    if (!memory) {
+
+                        reject(
+                            new Error(
+                                "Memory not found"
+                            )
+                        );
+
+                        return;
+
+                    }
+
+
+                    memory.name =
+                        newName;
+
+
+                    const updateRequest =
+                        store.put(memory);
+
+
+                    updateRequest.onsuccess =
+                        function() {
+
+                            resolve();
+
+                        };
+
+
+                    updateRequest.onerror =
+                        function() {
+
+                            reject(
+                                updateRequest.error
+                            );
+
+                        };
+
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   INITIALIZE WAVESURFER
+===================================================== */
 
 function initializeWaveSurfer() {
 
+
     regionsPlugin =
         WaveSurfer.Regions.create();
+
 
 
     wavesurfer =
@@ -762,6 +1168,8 @@ function initializeWaveSurfer() {
 
             normalize: true,
 
+            dragToSeek: true,
+
             plugins: [
                 regionsPlugin
             ]
@@ -769,53 +1177,97 @@ function initializeWaveSurfer() {
         });
 
 
-    wavesurfer.on("ready", function() {
 
-        createDefaultRegion();
+    /* -----------------------------------------------
+       AUDIO READY
+    ------------------------------------------------ */
 
-        enableControls(true);
+    wavesurfer.on(
+        "ready",
+        function() {
 
-        updateSelectionInfo();
-
-        showStatus(
-            "Audio loaded. Drag the selection handles to trim your memory."
-        );
-
-    });
+            createDefaultRegion();
 
 
-    wavesurfer.on("play", function() {
-
-        document.getElementById(
-            "playPauseButton"
-        ).textContent = "Pause";
-
-    });
+            enableControls(true);
 
 
-    wavesurfer.on("pause", function() {
-
-        document.getElementById(
-            "playPauseButton"
-        ).textContent = "Play Selection";
-
-    });
+            updateSelectionInfo();
 
 
-    wavesurfer.on("finish", function() {
+            showStatus(
+                "Audio loaded. Select the section you want to save."
+            );
 
-        document.getElementById(
-            "playPauseButton"
-        ).textContent = "Play Selection";
+        }
+    );
 
-    });
 
+
+    /* -----------------------------------------------
+       PLAY
+    ------------------------------------------------ */
+
+    wavesurfer.on(
+        "play",
+        function() {
+
+            document.getElementById(
+                "playPauseButton"
+            ).textContent =
+                "Pause";
+
+        }
+    );
+
+
+
+    /* -----------------------------------------------
+       PAUSE
+    ------------------------------------------------ */
+
+    wavesurfer.on(
+        "pause",
+        function() {
+
+            document.getElementById(
+                "playPauseButton"
+            ).textContent =
+                "Play Selection";
+
+        }
+    );
+
+
+
+    /* -----------------------------------------------
+       FINISH
+    ------------------------------------------------ */
+
+    wavesurfer.on(
+        "finish",
+        function() {
+
+            document.getElementById(
+                "playPauseButton"
+            ).textContent =
+                "Play Selection";
+
+        }
+    );
+
+
+
+    /* -----------------------------------------------
+       REGION UPDATED
+    ------------------------------------------------ */
 
     regionsPlugin.on(
         "region-updated",
         function(region) {
 
-            selectedRegion = region;
+            selectedRegion =
+                region;
 
             updateSelectionInfo();
 
@@ -823,15 +1275,21 @@ function initializeWaveSurfer() {
     );
 
 
+
+    /* -----------------------------------------------
+       REGION CLICK
+    ------------------------------------------------ */
+
     regionsPlugin.on(
         "region-clicked",
         function(region, event) {
 
             event.stopPropagation();
 
-            selectedRegion = region;
+            selectedRegion =
+                region;
 
-            region.play();
+            updateSelectionInfo();
 
         }
     );
@@ -839,17 +1297,38 @@ function initializeWaveSurfer() {
 }
 
 
-// =====================================================
-// DEFAULT REGION
-// =====================================================
+
+/* =====================================================
+   CREATE DEFAULT REGION
+===================================================== */
 
 function createDefaultRegion() {
+
+    if (
+        !wavesurfer ||
+        !regionsPlugin
+    ) {
+
+        return;
+
+    }
+
 
     regionsPlugin.clear();
 
 
     const duration =
         wavesurfer.getDuration();
+
+
+    if (
+        !duration ||
+        !isFinite(duration)
+    ) {
+
+        return;
+
+    }
 
 
     selectedRegion =
@@ -859,7 +1338,8 @@ function createDefaultRegion() {
 
             end: duration,
 
-            color: "rgba(155,136,110,0.22)",
+            color:
+                "rgba(155,136,110,0.22)",
 
             drag: true,
 
@@ -873,15 +1353,17 @@ function createDefaultRegion() {
 }
 
 
-// =====================================================
-// UPLOAD
-// =====================================================
+
+/* =====================================================
+   FILE UPLOAD
+===================================================== */
 
 document
 .getElementById("fileInput")
 .addEventListener(
     "change",
     function(event) {
+
 
         const file =
             event.target.files[0];
@@ -894,7 +1376,10 @@ document
         }
 
 
-        if (!file.type.startsWith("audio/")) {
+
+        if (
+            !file.type.startsWith("audio/")
+        ) {
 
             showStatus(
                 "Please choose a valid audio file."
@@ -907,6 +1392,19 @@ document
         }
 
 
+
+        /* Stop current playback */
+
+        if (wavesurfer) {
+
+            wavesurfer.pause();
+
+        }
+
+
+
+        /* Remove previous object URL */
+
         if (currentAudioURL) {
 
             URL.revokeObjectURL(
@@ -916,9 +1414,17 @@ document
         }
 
 
-        currentAudioURL =
-            URL.createObjectURL(file);
 
+        /* Create new object URL */
+
+        currentAudioURL =
+            URL.createObjectURL(
+                file
+            );
+
+
+
+        /* Put file name into memory name */
 
         document.getElementById(
             "memoryName"
@@ -928,6 +1434,30 @@ document
                 ""
             );
 
+
+
+        /* ---------------------------------------------
+           ORIGINAL AUDIO PLAYER
+        --------------------------------------------- */
+
+        const originalAudio =
+            document.getElementById(
+                "originalAudio"
+            );
+
+
+        originalAudio.src =
+            currentAudioURL;
+
+
+        document.getElementById(
+            "originalPlayer"
+        ).style.display =
+            "block";
+
+
+
+        /* Disable controls while loading */
 
         enableControls(false);
 
@@ -943,6 +1473,9 @@ document
         );
 
 
+
+        /* Load waveform */
+
         wavesurfer.load(
             currentAudioURL
         );
@@ -951,38 +1484,61 @@ document
 );
 
 
-// =====================================================
-// PLAY / PAUSE
-// =====================================================
 
-function playPause() {
+/* =====================================================
+   PLAY SELECTION
+===================================================== */
+
+function playSelection() {
 
     if (
         !wavesurfer ||
         !selectedRegion
     ) {
 
+        showStatus(
+            "Please upload an audio file first."
+        );
+
         return;
 
     }
 
 
-    if (wavesurfer.isPlaying()) {
+
+    if (
+        wavesurfer.isPlaying()
+    ) {
 
         wavesurfer.pause();
 
-    } else {
-
-        selectedRegion.play();
+        return;
 
     }
+
+
+
+    const start =
+        selectedRegion.start;
+
+
+    const end =
+        selectedRegion.end;
+
+
+
+    wavesurfer.play(
+        start,
+        end
+    );
 
 }
 
 
-// =====================================================
-// RESET SELECTION
-// =====================================================
+
+/* =====================================================
+   RESET SELECTION
+===================================================== */
 
 function resetSelection() {
 
@@ -991,6 +1547,9 @@ function resetSelection() {
         return;
 
     }
+
+
+    wavesurfer.pause();
 
 
     createDefaultRegion();
@@ -1003,20 +1562,25 @@ function resetSelection() {
 }
 
 
-// =====================================================
-// UPDATE INFO
-// =====================================================
+
+/* =====================================================
+   UPDATE SELECTION INFO
+===================================================== */
 
 function updateSelectionInfo() {
+
+    const info =
+        document.getElementById(
+            "selectionInfo"
+        );
+
 
     if (
         !wavesurfer ||
         !selectedRegion
     ) {
 
-        document.getElementById(
-            "selectionInfo"
-        ).textContent =
+        info.textContent =
             "Upload an audio file to begin.";
 
         return;
@@ -1032,53 +1596,56 @@ function updateSelectionInfo() {
         selectedRegion.end;
 
 
-    const length =
+    const duration =
         end - start;
 
 
-    document.getElementById(
-        "selectionInfo"
-    ).textContent =
-
+    info.textContent =
         "Selected: " +
         formatTime(start) +
         " – " +
         formatTime(end) +
         " (" +
-        formatTime(length) +
+        formatTime(duration) +
         ")";
 
 }
 
 
-// =====================================================
-// ENABLE / DISABLE CONTROLS
-// =====================================================
+
+/* =====================================================
+   ENABLE CONTROLS
+===================================================== */
 
 function enableControls(enabled) {
 
     document.getElementById(
         "playPauseButton"
-    ).disabled = !enabled;
+    ).disabled =
+        !enabled;
 
 
     document.getElementById(
         "resetButton"
-    ).disabled = !enabled;
+    ).disabled =
+        !enabled;
 
 
     document.getElementById(
         "saveButton"
-    ).disabled = !enabled;
+    ).disabled =
+        !enabled;
 
 }
 
 
-// =====================================================
-// SAVE MEMORY
-// =====================================================
+
+/* =====================================================
+   SAVE MEMORY
+===================================================== */
 
 async function saveMemory() {
+
 
     if (
         !currentAudioURL ||
@@ -1095,12 +1662,14 @@ async function saveMemory() {
     }
 
 
+
     const start =
         selectedRegion.start;
 
 
     const end =
         selectedRegion.end;
+
 
 
     if (
@@ -1117,18 +1686,21 @@ async function saveMemory() {
     }
 
 
+
     let name =
-        document
-        .getElementById("memoryName")
-        .value
-        .trim();
+        document.getElementById(
+            "memoryName"
+        ).value.trim();
+
 
 
     if (!name) {
 
-        name = "Voice Memory";
+        name =
+            "Voice Memory";
 
     }
+
 
 
     const saveButton =
@@ -1137,20 +1709,24 @@ async function saveMemory() {
         );
 
 
-    saveButton.disabled = true;
+    saveButton.disabled =
+        true;
+
 
     saveButton.textContent =
         "Saving...";
 
 
     showStatus(
-        "Trimming and saving your memory..."
+        "Creating trimmed audio..."
     );
+
 
 
     try {
 
-        const audioBlob =
+
+        const trimmedAudio =
             await createTrimmedAudio(
                 currentAudioURL,
                 start,
@@ -1158,17 +1734,25 @@ async function saveMemory() {
             );
 
 
+
         await addMemory({
 
             name: name,
 
-            audio: audioBlob,
+            audio: trimmedAudio,
 
-            duration: end - start,
+            duration:
+                end - start,
 
-            createdAt: Date.now()
+            createdAt:
+                Date.now()
 
         });
+
+
+
+        await displayMemories();
+
 
 
         showStatus(
@@ -1176,41 +1760,39 @@ async function saveMemory() {
         );
 
 
-        await displayMemories();
-
-
-        saveButton.textContent =
-            "Save Memory";
-
-
-        saveButton.disabled = false;
-
     }
 
     catch(error) {
 
-        console.error(error);
 
-
-        showStatus(
-            "Could not save the memory. Please try another audio file."
+        console.error(
+            "Save error:",
+            error
         );
 
 
-        saveButton.textContent =
-            "Save Memory";
-
-
-        saveButton.disabled = false;
+        showStatus(
+            "Could not save the audio. Please try another file."
+        );
 
     }
+
+
+
+    saveButton.disabled =
+        false;
+
+
+    saveButton.textContent =
+        "Save Memory";
 
 }
 
 
-// =====================================================
-// CREATE TRIMMED AUDIO
-// =====================================================
+
+/* =====================================================
+   CREATE TRIMMED AUDIO
+===================================================== */
 
 async function createTrimmedAudio(
     audioURL,
@@ -1218,12 +1800,26 @@ async function createTrimmedAudio(
     endTime
 ) {
 
+
     const response =
-        await fetch(audioURL);
+        await fetch(
+            audioURL
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Could not read audio."
+        );
+
+    }
+
 
 
     const arrayBuffer =
         await response.arrayBuffer();
+
 
 
     const AudioContext =
@@ -1231,11 +1827,24 @@ async function createTrimmedAudio(
         window.webkitAudioContext;
 
 
+
+    if (!AudioContext) {
+
+        throw new Error(
+            "Web Audio API not supported."
+        );
+
+    }
+
+
+
     const audioContext =
         new AudioContext();
 
 
+
     try {
+
 
         const originalBuffer =
             await audioContext.decodeAudioData(
@@ -1243,27 +1852,48 @@ async function createTrimmedAudio(
             );
 
 
+
         const sampleRate =
             originalBuffer.sampleRate;
 
 
+
         const startSample =
-            Math.floor(
-                startTime * sampleRate
+            Math.max(
+                0,
+                Math.floor(
+                    startTime *
+                    sampleRate
+                )
             );
+
 
 
         const endSample =
             Math.min(
                 originalBuffer.length,
                 Math.floor(
-                    endTime * sampleRate
+                    endTime *
+                    sampleRate
                 )
             );
 
 
+
         const frameCount =
-            endSample - startSample;
+            endSample -
+            startSample;
+
+
+
+        if (frameCount <= 0) {
+
+            throw new Error(
+                "Invalid selection."
+            );
+
+        }
+
 
 
         const trimmedBuffer =
@@ -1278,11 +1908,14 @@ async function createTrimmedAudio(
             );
 
 
+
         for (
             let channel = 0;
-            channel < originalBuffer.numberOfChannels;
+            channel <
+            originalBuffer.numberOfChannels;
             channel++
         ) {
+
 
             const sourceData =
                 originalBuffer.getChannelData(
@@ -1290,13 +1923,13 @@ async function createTrimmedAudio(
                 );
 
 
-            const targetData =
+            const destinationData =
                 trimmedBuffer.getChannelData(
                     channel
                 );
 
 
-            targetData.set(
+            destinationData.set(
                 sourceData.slice(
                     startSample,
                     endSample
@@ -1304,6 +1937,7 @@ async function createTrimmedAudio(
             );
 
         }
+
 
 
         return audioBufferToWav(
@@ -1314,18 +1948,31 @@ async function createTrimmedAudio(
 
     finally {
 
-        await audioContext.close();
+
+        try {
+
+            await audioContext.close();
+
+        }
+
+        catch(error) {
+
+            console.warn(error);
+
+        }
 
     }
 
 }
 
 
-// =====================================================
-// CONVERT AUDIOBUFFER TO WAV
-// =====================================================
+
+/* =====================================================
+   AUDIOBUFFER TO WAV
+===================================================== */
 
 function audioBufferToWav(buffer) {
+
 
     const numberOfChannels =
         buffer.numberOfChannels;
@@ -1335,9 +1982,8 @@ function audioBufferToWav(buffer) {
         buffer.sampleRate;
 
 
-    const format = 1;
-
-    const bitDepth = 16;
+    const bitDepth =
+        16;
 
 
     const bytesPerSample =
@@ -1350,6 +1996,7 @@ function audioBufferToWav(buffer) {
         bytesPerSample;
 
 
+
     const arrayBuffer =
         new ArrayBuffer(
             44 + dataLength
@@ -1360,6 +2007,7 @@ function audioBufferToWav(buffer) {
         new DataView(
             arrayBuffer
         );
+
 
 
     writeString(
@@ -1399,7 +2047,7 @@ function audioBufferToWav(buffer) {
 
     view.setUint16(
         20,
-        format,
+        1,
         true
     );
 
@@ -1456,23 +2104,10 @@ function audioBufferToWav(buffer) {
     );
 
 
-    let offset = 44;
 
+    let offset =
+        44;
 
-    const channelData = [];
-
-
-    for (
-        let channel = 0;
-        channel < numberOfChannels;
-        channel++
-    ) {
-
-        channelData.push(
-            buffer.getChannelData(channel)
-        );
-
-    }
 
 
     for (
@@ -1481,14 +2116,21 @@ function audioBufferToWav(buffer) {
         i++
     ) {
 
+
         for (
             let channel = 0;
-            channel < numberOfChannels;
+            channel <
+            numberOfChannels;
             channel++
         ) {
 
+
             let sample =
-                channelData[channel][i];
+                buffer
+                .getChannelData(
+                    channel
+                )[i];
+
 
 
             sample =
@@ -1501,10 +2143,12 @@ function audioBufferToWav(buffer) {
                 );
 
 
+
             const value =
                 sample < 0
                     ? sample * 0x8000
                     : sample * 0x7fff;
+
 
 
             view.setInt16(
@@ -1521,6 +2165,7 @@ function audioBufferToWav(buffer) {
     }
 
 
+
     return new Blob(
         [arrayBuffer],
         {
@@ -1531,15 +2176,17 @@ function audioBufferToWav(buffer) {
 }
 
 
-// =====================================================
-// WRITE STRING
-// =====================================================
+
+/* =====================================================
+   WRITE STRING
+===================================================== */
 
 function writeString(
     view,
     offset,
     string
 ) {
+
 
     for (
         let i = 0;
@@ -1557,11 +2204,13 @@ function writeString(
 }
 
 
-// =====================================================
-// DISPLAY SAVED MEMORIES
-// =====================================================
+
+/* =====================================================
+   DISPLAY MEMORIES
+===================================================== */
 
 async function displayMemories() {
+
 
     const list =
         document.getElementById(
@@ -1569,24 +2218,36 @@ async function displayMemories() {
         );
 
 
-    list.innerHTML = "";
+    list.innerHTML =
+        "";
 
 
-    // Remove old temporary URLs
+
+    /* Remove old object URLs */
 
     memoryObjectURLs.forEach(
-        url => URL.revokeObjectURL(url)
+        function(url) {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        }
     );
 
 
-    memoryObjectURLs = [];
+    memoryObjectURLs =
+        [];
+
 
 
     const memories =
         await getMemories();
 
 
+
     if (!memories.length) {
+
 
         list.innerHTML = `
 
@@ -1594,20 +2255,23 @@ async function displayMemories() {
 
                 No saved memories yet.<br>
 
-                Upload a recording, trim it,
+                Upload a recording, select a section,
                 and click <b>Save Memory</b>.
 
             </div>
 
         `;
 
+
         return;
 
     }
 
 
+
     memories.forEach(
-        memory => {
+        function(memory) {
+
 
             const item =
                 document.createElement(
@@ -1617,6 +2281,7 @@ async function displayMemories() {
 
             item.className =
                 "memory-item";
+
 
 
             const audioURL =
@@ -1630,6 +2295,7 @@ async function displayMemories() {
             );
 
 
+
             item.innerHTML = `
 
                 <div class="memory-item-top">
@@ -1637,13 +2303,19 @@ async function displayMemories() {
                     <div class="memory-info">
 
                         <h3>
-                            ${escapeHTML(memory.name)}
+                            ${escapeHTML(
+                                memory.name
+                            )}
                         </h3>
 
                         <span>
-                            ${formatTime(memory.duration)}
+                            ${formatTime(
+                                memory.duration
+                            )}
                             &nbsp; • &nbsp;
-                            ${formatDate(memory.createdAt)}
+                            ${formatDate(
+                                memory.createdAt
+                            )}
                         </span>
 
                     </div>
@@ -1652,12 +2324,15 @@ async function displayMemories() {
                     <div class="memory-actions">
 
                         <button
+                            type="button"
                             onclick="renameMemory(${memory.id})"
                         >
                             Rename
                         </button>
 
+
                         <button
+                            type="button"
                             class="delete-btn"
                             onclick="deleteMemory(${memory.id})"
                         >
@@ -1678,6 +2353,7 @@ async function displayMemories() {
             `;
 
 
+
             list.appendChild(
                 item
             );
@@ -1688,20 +2364,28 @@ async function displayMemories() {
 }
 
 
-// =====================================================
-// RENAME
-// =====================================================
+
+/* =====================================================
+   RENAME
+===================================================== */
 
 async function renameMemory(id) {
+
 
     const memories =
         await getMemories();
 
 
+
     const memory =
         memories.find(
-            item => item.id === id
+            function(item) {
+
+                return item.id === id;
+
+            }
         );
+
 
 
     if (!memory) {
@@ -1711,11 +2395,13 @@ async function renameMemory(id) {
     }
 
 
+
     const newName =
         prompt(
             "Enter a new name:",
             memory.name
         );
+
 
 
     if (
@@ -1728,7 +2414,9 @@ async function renameMemory(id) {
     }
 
 
+
     try {
+
 
         await renameMemoryInDB(
             id,
@@ -1739,11 +2427,18 @@ async function renameMemory(id) {
         await displayMemories();
 
 
+        showStatus(
+            "Memory renamed."
+        );
+
+
     }
 
     catch(error) {
 
+
         console.error(error);
+
 
         showStatus(
             "Could not rename the memory."
@@ -1754,16 +2449,19 @@ async function renameMemory(id) {
 }
 
 
-// =====================================================
-// DELETE
-// =====================================================
+
+/* =====================================================
+   DELETE
+===================================================== */
 
 async function deleteMemory(id) {
+
 
     const confirmed =
         confirm(
             "Delete this saved memory?"
         );
+
 
 
     if (!confirmed) {
@@ -1773,7 +2471,9 @@ async function deleteMemory(id) {
     }
 
 
+
     try {
+
 
         await deleteMemoryFromDB(
             id
@@ -1787,11 +2487,14 @@ async function deleteMemory(id) {
             "Memory deleted."
         );
 
+
     }
 
     catch(error) {
 
+
         console.error(error);
+
 
         showStatus(
             "Could not delete the memory."
@@ -1802,11 +2505,13 @@ async function deleteMemory(id) {
 }
 
 
-// =====================================================
-// FORMAT TIME
-// =====================================================
+
+/* =====================================================
+   FORMAT TIME
+===================================================== */
 
 function formatTime(seconds) {
+
 
     if (
         !isFinite(seconds) ||
@@ -1818,10 +2523,12 @@ function formatTime(seconds) {
     }
 
 
+
     const minutes =
         Math.floor(
             seconds / 60
         );
+
 
 
     const remainingSeconds =
@@ -1830,28 +2537,31 @@ function formatTime(seconds) {
         );
 
 
+
     return (
         minutes +
         ":" +
         String(
             remainingSeconds
-        ).padStart(2, "0")
+        ).padStart(
+            2,
+            "0"
+        )
     );
 
 }
 
 
-// =====================================================
-// FORMAT DATE
-// =====================================================
+
+/* =====================================================
+   FORMAT DATE
+===================================================== */
 
 function formatDate(timestamp) {
 
-    const date =
-        new Date(timestamp);
-
-
-    return date.toLocaleDateString(
+    return new Date(
+        timestamp
+    ).toLocaleDateString(
         undefined,
         {
             day: "numeric",
@@ -1863,9 +2573,10 @@ function formatDate(timestamp) {
 }
 
 
-// =====================================================
-// ESCAPE HTML
-// =====================================================
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
 
 function escapeHTML(value) {
 
@@ -1899,9 +2610,10 @@ function escapeHTML(value) {
 }
 
 
-// =====================================================
-// STATUS
-// =====================================================
+
+/* =====================================================
+   STATUS
+===================================================== */
 
 function showStatus(message) {
 
@@ -1913,25 +2625,36 @@ function showStatus(message) {
 }
 
 
-// =====================================================
-// INITIALIZE
-// =====================================================
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
 
 async function initialize() {
 
+
     try {
+
 
         await openDatabase();
 
+
         initializeWaveSurfer();
 
+
         await displayMemories();
+
 
     }
 
     catch(error) {
 
-        console.error(error);
+
+        console.error(
+            "Initialization error:",
+            error
+        );
+
 
         document.getElementById(
             "memoryList"
@@ -1939,8 +2662,7 @@ async function initialize() {
 
             <div class="empty-state">
 
-                Unable to access saved memories
-                in this browser.
+                Unable to load saved memories.
 
             </div>
 
@@ -1951,16 +2673,26 @@ async function initialize() {
 }
 
 
+
 initialize();
 
 
-// =====================================================
-// CLEANUP
-// =====================================================
+
+/* =====================================================
+   CLEANUP
+===================================================== */
 
 window.addEventListener(
     "beforeunload",
     function() {
+
+
+        if (wavesurfer) {
+
+            wavesurfer.destroy();
+
+        }
+
 
         if (currentAudioURL) {
 
@@ -1972,7 +2704,13 @@ window.addEventListener(
 
 
         memoryObjectURLs.forEach(
-            url => URL.revokeObjectURL(url)
+            function(url) {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            }
         );
 
     }
@@ -1981,4 +2719,5 @@ window.addEventListener(
 </script>
 
 </body>
+
 </html>
