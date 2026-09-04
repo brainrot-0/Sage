@@ -6,7 +6,7 @@
 <title>MindEase AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Poppins',sans-serif;background:#e8ded2;color:#4d443d;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -37,16 +37,21 @@ body{font-family:'Poppins',sans-serif;background:#e8ded2;color:#4d443d;min-heigh
 .feature-container{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
 .feature-btn{border:none;background:#d8c8b8;color:#5a4d42;padding:8px 11px;border-radius:10px;font-family:'Poppins',sans-serif;font-size:12px;cursor:pointer;transition:.2s}
 .feature-btn:hover{background:#cbb8a6;transform:translateY(-1px)}
+.typing{display:flex;gap:5px;align-items:center;width:max-content;padding:13px 16px;background:rgba(255,255,255,.72);border-radius:18px;border-bottom-left-radius:5px;margin-bottom:15px}
+.typing span{width:6px;height:6px;background:#8b7a6a;border-radius:50%;animation:typing 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
 .chat-form{padding:18px 6%;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.18)}
 .chat-form input[type="text"]{flex:1;border:none;outline:none;background:rgba(255,255,255,.72);padding:13px 17px;border-radius:14px;font-family:'Poppins',sans-serif;color:#51463d;font-size:14px}
 .chat-form input[type="text"]::placeholder{color:#9a8b7d}
 .chat-form button{border:none;width:46px;height:46px;border-radius:13px;background:#9e8d7c;color:#fff;cursor:pointer;transition:.2s}
 .chat-form button:hover{background:#887665;transform:translateY(-1px)}
+.chat-form button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .file-upload{width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#76685b;transition:.2s}
 .file-upload:hover{background:rgba(255,255,255,.9)}
 .file-upload input{display:none}
 .bot-prompt{font-size:12px;color:#918276;text-align:center;margin-top:5px}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:768px){
 body{overflow:auto}
 .layout{width:100%;height:100vh;border-radius:0}
@@ -59,38 +64,76 @@ body{overflow:auto}
 </head>
 <body>
 <div class="background-overlay"></div>
+
 <div class="layout">
+
 <aside class="sidebar">
-<div class="logo"><i class="fas fa-brain"></i>MindEase AI</div>
-<button class="sidebar-btn" id="newChatBtn"><i class="fas fa-plus"></i> New Chat</button>
-<button class="sidebar-btn" id="exportBtn"><i class="fas fa-download"></i> Export Chat</button>
-<button class="sidebar-btn" id="clearBtn"><i class="fas fa-trash"></i> Delete All History</button>
+
+<div class="logo">
+<i class="fas fa-brain"></i>MindEase AI
+</div>
+
+<button class="sidebar-btn" id="newChatBtn">
+<i class="fas fa-plus"></i> New Chat
+</button>
+
+<button class="sidebar-btn" id="exportBtn">
+<i class="fas fa-download"></i> Export Chat
+</button>
+
+<button class="sidebar-btn" id="clearBtn">
+<i class="fas fa-trash"></i> Delete All History
+</button>
+
 <div class="history-title">Recent Chats</div>
+
 <div class="chat-history-list" id="chatHistory"></div>
+
 </aside>
+
 <main class="chat-area">
+
 <header class="chat-header">
 <div>
 <h1>MindEase Assistant</h1>
 <p>Your friendly space to talk, reflect and feel heard.</p>
 </div>
 </header>
+
 <div class="chat-box" id="chatBox"></div>
-<div class="bot-prompt">MindEase AI is here to listen.</div>
+
+<div class="bot-prompt">
+MindEase AI is here to listen.
+</div>
+
 <form class="chat-form" id="chatForm">
+
 <label class="file-upload" title="Share an image">
 <i class="fas fa-image"></i>
 <input type="file" id="fileInput" accept="image/*">
 </label>
-<input type="text" id="userInput" placeholder="Talk to me..." autocomplete="off">
-<button type="submit" title="Send"><i class="fas fa-paper-plane"></i></button>
+
+<input
+type="text"
+id="userInput"
+placeholder="Talk to me..."
+autocomplete="off"
+>
+
+<button type="submit" id="sendButton" title="Send">
+<i class="fas fa-paper-plane"></i>
+</button>
+
 </form>
+
 </main>
 </div>
+
 <script>
 const chatBox=document.getElementById("chatBox");
 const chatForm=document.getElementById("chatForm");
 const userInput=document.getElementById("userInput");
+const sendButton=document.getElementById("sendButton");
 const newChatBtn=document.getElementById("newChatBtn");
 const exportBtn=document.getElementById("exportBtn");
 const clearBtn=document.getElementById("clearBtn");
@@ -98,170 +141,39 @@ const fileInput=document.getElementById("fileInput");
 const chatHistory=document.getElementById("chatHistory");
 
 const STORAGE_KEY="mindease_chat_sessions";
+
 let currentSessionId=null;
 let localMessages=[];
 let chatSessions=[];
-let currentUserId="local_user";
 
-let conversationContext={
+function createId(){
+return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+}
+
+function createContext(){
+return{
 userName:"",
 lastMood:"neutral",
 moodHistory:[],
 lastTopic:"",
 lastIntent:"",
 lastSuggestion:"",
+conversationStage:"opening",
 recentUserMessages:[],
 recentBotMessages:[],
 messageCount:0,
+crisisContext:false,
 sessionStart:new Date().toISOString()
 };
-
-const aiDatabase={
-sad:[
-"I’m sorry you’re feeling this way. You don’t have to pretend that everything is okay with me.",
-"It sounds like you’re carrying a lot emotionally right now. I’m here to listen.",
-"Some days can feel heavier than others. It’s okay to take things slowly.",
-"I hear you. You deserve a little kindness and patience with yourself today.",
-"It’s understandable to feel low sometimes. You don’t have to work through everything at once.",
-"That sounds difficult. If you want, you can tell me a little more about what has been bothering you.",
-"You don’t have to have all the answers right now. Let’s take this one moment at a time.",
-"I’m glad you chose to talk about it instead of keeping everything inside.",
-"Feeling sad doesn’t make you weak. Your feelings are worth acknowledging.",
-"That sounds like a hard moment. I’m here with you, and we can talk through it.",
-"Sometimes simply putting feelings into words can make them feel a little less overwhelming.",
-"You deserve time to rest, process what you’re feeling and take care of yourself.",
-"It sounds like today has been emotionally difficult. Be gentle with yourself.",
-"You don’t have to force yourself to feel better immediately. We can take it slowly together."
-],
-stressed:[
-"It sounds like you have a lot on your mind right now. Let’s slow things down for a moment.",
-"That sounds overwhelming. You don’t need to solve everything at once.",
-"When everything piles up, even a short pause can help. Take a breath and give yourself a moment.",
-"It seems like you’ve been under quite a bit of pressure. You deserve a little time to reset.",
-"Stress can make everything feel urgent at the same time. Let’s focus on just one thing first.",
-"You sound really overwhelmed. We can break things down into smaller, more manageable pieces.",
-"Take a moment to breathe. You don’t have to figure everything out right this second.",
-"It sounds like you’ve been pushing yourself quite hard. A small break might help.",
-"When your mind feels crowded, slowing down can make the next step easier to see.",
-"You’re dealing with a lot right now. Let’s make things feel a little lighter, one step at a time.",
-"It’s okay to pause when things become too much. Rest is not wasted time.",
-"Your mind may simply need a moment away from all the pressure. Let’s give it one.",
-"Try not to put the entire weight of everything on yourself at once.",
-"Even a few quiet minutes can help your mind settle when you’re feeling overwhelmed."
-],
-happy:[
-"I’m glad to hear that! It’s nice to know you’re having a good moment.",
-"That’s wonderful to hear. I hope you get to enjoy this feeling for a while.",
-"You sound genuinely happy, and that’s lovely. Hold onto that feeling.",
-"That’s great! Moments like these are worth appreciating.",
-"I’m happy for you. What made today feel good?",
-"That sounds like a really positive moment. You deserve more days like this.",
-"It’s nice hearing some good energy from you. Keep enjoying it.",
-"That’s fantastic! Sometimes the little wins are the ones worth celebrating.",
-"You seem to be in a really good mood today. I’m glad.",
-"That’s lovely. Tell me more about what made you feel this way.",
-"It sounds like something really nice happened. I’d love to hear about it.",
-"Good moments matter too. I’m glad you’re giving yourself space to enjoy one.",
-"That’s great to hear. I hope the rest of your day continues in the same direction.",
-"You’ve got some positive energy today. Let’s keep it going."
-],
-angry:[
-"It sounds like something has really frustrated you. It’s okay to talk about it.",
-"I can hear the frustration in what you’re saying. Let’s take a moment before reacting.",
-"You have every right to feel frustrated when something feels unfair or difficult.",
-"It sounds like you’re really angry about this. If you want, tell me what happened.",
-"Sometimes getting the thoughts out can help reduce some of the pressure.",
-"That sounds upsetting. We can slow down and look at what is bothering you.",
-"It’s okay to acknowledge anger without letting it control what you do next.",
-"You sound really frustrated. Let’s work through the situation one piece at a time.",
-"Strong emotions can make everything feel more intense. Taking a short pause may help.",
-"I hear you. You don’t have to hide the fact that you’re angry.",
-"It sounds like something crossed a line for you. What happened?",
-"Before doing anything impulsive, give yourself a little space to cool down.",
-"Your frustration is understandable. Let’s figure out what is actually within your control.",
-"Sometimes being heard is the first step toward feeling calmer. I’m listening."
-],
-neutral:[
-"I’m here. What would you like to talk about?",
-"Of course. Tell me what’s on your mind.",
-"I’m listening. You can talk to me about whatever you’d like.",
-"Sure. What are you thinking about?",
-"Take your time. I’m here whenever you’re ready.",
-"Absolutely. Tell me a little more.",
-"I’m with you. What would you like help with?",
-"Go ahead. I’m listening.",
-"Of course. We can talk about it together.",
-"Tell me what’s going on.",
-"I’m here to chat. What would you like to discuss?",
-"Take your time and say whatever feels comfortable.",
-"Sure. Let’s talk about it.",
-"I’m listening. Where would you like to start?"
-]
-};
-
-const casualResponses={
-greeting:[
-"Hello! It’s nice to have you here. How are you doing today?",
-"Hi! I’m glad you stopped by. How has your day been?",
-"Hey! I’m here and ready to listen. What’s on your mind?",
-"Hello! How are you feeling today?",
-"Hi there. What would you like to talk about?"
-],
-howAreYou:[
-"I’m doing well, thank you for asking. More importantly, how are you feeling?",
-"I’m here and ready to listen. How are things going for you?",
-"I’m doing okay. Tell me how your day is going.",
-"I’m right here with you. How have you been feeling lately?"
-],
-thanks:[
-"You’re very welcome.",
-"Of course. I’m glad I could be here for you.",
-"Anytime. I’m happy to listen.",
-"You don’t need to thank me. I’m here whenever you need to talk.",
-"Of course. Take care of yourself."
-],
-goodbye:[
-"Take care of yourself. I’ll be here whenever you want to talk again.",
-"Goodbye for now. Be gentle with yourself.",
-"See you later. I hope the rest of your day goes well.",
-"Take care. Remember that you can always come back and talk.",
-"Bye for now. I’m glad we got to chat."
-],
-day:[
-"That sounds like a good place to start. How has your day actually been?",
-"Tell me about your day. Was it mostly good, stressful, or somewhere in between?",
-"I’d like to hear about it. What has your day been like?",
-"Go ahead. Tell me what happened today."
-],
-name:[
-"You can call me MindEase Assistant. I’m here to listen and chat with you.",
-"I’m MindEase Assistant. Think of me as a friendly space where you can talk things through.",
-"My name is MindEase Assistant. What should I call you?"
-],
-compliment:[
-"That’s kind of you to say. Thank you.",
-"That made me smile. I appreciate that.",
-"Thank you. I’m glad I can be useful to you.",
-"That’s really sweet of you. I appreciate it."
-],
-joke:[
-"Why did the computer go to therapy? It had too many bytes of emotional baggage.",
-"Why was the computer cold? It left its Windows open.",
-"What do you call a computer that sings? A Dell-ighted one.",
-"I would tell you a better joke, but my humor module is still loading."
-]
-};
-
-function randomResponse(list){
-return list[Math.floor(Math.random()*list.length)];
 }
 
-function createId(){
-return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-}
+let conversationContext=createContext();
 
 function saveSessions(){
-localStorage.setItem(STORAGE_KEY,JSON.stringify(chatSessions));
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(chatSessions)
+);
 }
 
 function loadSessions(){
@@ -274,26 +186,43 @@ chatSessions=[];
 }
 }
 
-function createContext(){
-return{
-userName:"",
-lastMood:"neutral",
-moodHistory:[],
-lastTopic:"",
-lastIntent:"",
-lastSuggestion:"",
-recentUserMessages:[],
-recentBotMessages:[],
-messageCount:0,
-sessionStart:new Date().toISOString()
-};
+function getCurrentSession(){
+return chatSessions.find(
+session=>session.id===currentSessionId
+);
+}
+
+function updateCurrentSession(){
+
+const session=getCurrentSession();
+
+if(!session)return;
+
+session.messages=localMessages;
+session.context=conversationContext;
+session.updatedAt=new Date().toISOString();
+
+const firstUser=localMessages.find(
+message=>message.sender==="user"
+);
+
+if(firstUser){
+session.title=
+firstUser.text.length>35
+?firstUser.text.slice(0,35)+"..."
+:firstUser.text;
+}
+
+saveSessions();
+renderHistory();
 }
 
 function createSession(){
+
 currentSessionId=createId();
 localMessages=[];
 conversationContext=createContext();
-chatBox.innerHTML="";
+
 const session={
 id:currentSessionId,
 title:"New conversation",
@@ -302,90 +231,178 @@ context:conversationContext,
 createdAt:new Date().toISOString(),
 updatedAt:new Date().toISOString()
 };
+
 chatSessions.unshift(session);
-saveSessions();
-renderHistory();
-displayMessage("Hello! I’m glad you’re here. Think of me as a friendly space where you can talk, reflect, or simply have a casual conversation. How are you feeling today?","bot",[]);
-}
 
-function getCurrentSession(){
-return chatSessions.find(session=>session.id===currentSessionId);
-}
-
-function updateCurrentSession(){
-const session=getCurrentSession();
-if(!session)return;
-session.messages=localMessages;
-session.context=conversationContext;
-session.updatedAt=new Date().toISOString();
-if(localMessages.some(message=>message.sender==="user")){
-const firstUser=localMessages.find(message=>message.sender==="user");
-if(firstUser)session.title=firstUser.text.length>35?firstUser.text.slice(0,35)+"...":firstUser.text;
-}
 saveSessions();
-renderHistory();
+
+chatBox.innerHTML="";
+
+displayMessage(
+"Hello! I’m glad you’re here. You can talk to me about what's on your mind, ask a question, or simply have a conversation. How are you feeling today?",
+"bot"
+);
 }
 
 function loadSession(id){
-const session=chatSessions.find(item=>item.id===id);
+
+const session=chatSessions.find(
+item=>item.id===id
+);
+
 if(!session)return;
+
 currentSessionId=id;
-localMessages=Array.isArray(session.messages)?session.messages:[];
-conversationContext=session.context||createContext();
+
+localMessages=
+Array.isArray(session.messages)
+?session.messages
+:[];
+
+conversationContext={
+...createContext(),
+...(session.context||{})
+};
+
 chatBox.innerHTML="";
+
 localMessages.forEach(message=>{
-renderMessage(message.text,message.sender,message.features||[],message.type||"");
+renderMessage(
+message.text,
+message.sender,
+message.features||[],
+message.type||""
+);
 });
+
 renderHistory();
+
 chatBox.scrollTop=chatBox.scrollHeight;
 }
 
 function renderHistory(){
+
 chatHistory.innerHTML="";
-const sessions=chatSessions.filter(session=>session.messages&&session.messages.some(message=>message.sender==="user"));
+
+const sessions=chatSessions.filter(
+session=>
+session.messages &&
+session.messages.some(
+message=>message.sender==="user"
+)
+);
+
 if(!sessions.length){
+
 const empty=document.createElement("div");
-empty.style.cssText="font-size:12px;color:#9a8b7d;padding:10px 8px";
-empty.textContent="Your conversations will appear here.";
+
+empty.style.cssText=
+"font-size:12px;color:#9a8b7d;padding:10px 8px";
+
+empty.textContent=
+"Your conversations will appear here.";
+
 chatHistory.appendChild(empty);
+
 return;
 }
+
 sessions.slice(0,20).forEach(session=>{
+
 const item=document.createElement("div");
-item.className="chat-thread"+(session.id===currentSessionId?" active":"");
-item.textContent=session.title||"Conversation";
-item.title=session.title||"Conversation";
-item.addEventListener("click",()=>loadSession(session.id));
+
+item.className=
+"chat-thread"+
+(session.id===currentSessionId?" active":"");
+
+item.textContent=
+session.title||"Conversation";
+
+item.title=
+session.title||"Conversation";
+
+item.addEventListener(
+"click",
+()=>loadSession(session.id)
+);
+
 chatHistory.appendChild(item);
 });
 }
 
-function renderMessage(message,sender="bot",features=[],type=""){
+function renderMessage(
+message,
+sender="bot",
+features=[],
+type=""
+){
+
 const div=document.createElement("div");
-div.className="chat-message "+sender+(type==="crisis"?" crisis":"");
+
+div.className=
+"chat-message "+
+sender+
+(type==="crisis"?" crisis":"");
+
 div.textContent=message;
+
 if(features.length){
-const container=document.createElement("div");
-container.className="feature-container";
+
+const container=
+document.createElement("div");
+
+container.className=
+"feature-container";
+
 features.forEach(feature=>{
-const button=document.createElement("button");
-button.className="feature-btn";
+
+const button=
+document.createElement("button");
+
 button.type="button";
-button.textContent=getFeatureLabel(feature).label;
-button.addEventListener("click",()=>{
-conversationContext.lastSuggestion=feature;
+button.className="feature-btn";
+
+const featureData=
+getFeatureData(feature);
+
+button.textContent=
+featureData.label;
+
+button.addEventListener(
+"click",
+()=>{
+conversationContext.lastSuggestion=
+feature;
 openFeature(feature);
-});
+}
+);
+
 container.appendChild(button);
 });
+
 div.appendChild(container);
 }
+
 chatBox.appendChild(div);
-chatBox.scrollTop=chatBox.scrollHeight;
+
+chatBox.scrollTop=
+chatBox.scrollHeight;
 }
 
-function displayMessage(message,sender="bot",features=[],type=""){
-renderMessage(message,sender,features,type);
+function displayMessage(
+message,
+sender="bot",
+features=[],
+type=""
+){
+
+renderMessage(
+message,
+sender,
+features,
+type
+);
+
 localMessages.push({
 sender,
 text:message,
@@ -393,411 +410,686 @@ features,
 type,
 timestamp:new Date().toISOString()
 });
+
 if(sender==="user"){
-conversationContext.recentUserMessages.push(message);
-if(conversationContext.recentUserMessages.length>8)conversationContext.recentUserMessages.shift();
-conversationContext.messageCount++;
+
+conversationContext.recentUserMessages.push(
+message
+);
+
+conversationContext.recentUserMessages=
+conversationContext.recentUserMessages.slice(-8);
+
 }else{
-conversationContext.recentBotMessages.push(message);
-if(conversationContext.recentBotMessages.length>8)conversationContext.recentBotMessages.shift();
+
+conversationContext.recentBotMessages.push(
+message
+);
+
+conversationContext.recentBotMessages=
+conversationContext.recentBotMessages.slice(-8);
 }
+
+conversationContext.messageCount=
+localMessages.length;
+
 updateCurrentSession();
 }
 
-function getFeatureLabel(feature){
-const labels={
-journal:{label:"Open Journal",url:"journal.html"},
-breathing:{label:"Breathing Exercise",url:"relaxation-tools.html"},
-calmingSounds:{label:"Calming Sounds",url:"relaxation-tools.html"},
-doodle:{label:"Doodle Space",url:"doodle.html"},
-story:{label:"Motivational Read",url:"story1.html"},
-voiceMemory:{label:"Voice Memories",url:"voice-memories.html"}
+function getFeatureData(feature){
+
+const features={
+journal:{
+label:"Open Journal",
+url:"journal.html"
+},
+breathing:{
+label:"Breathing Exercise",
+url:"relaxation-tools.html"
+},
+calmingSounds:{
+label:"Calming Sounds",
+url:"relaxation-tools.html"
+},
+doodle:{
+label:"Doodle Space",
+url:"doodle.html"
+},
+story:{
+label:"Motivational Read",
+url:"story1.html"
+},
+voiceMemory:{
+label:"Voice Memories",
+url:"voice-memories.html"
+}
 };
-return labels[feature]||{label:"Open Feature",url:"#"};
+
+return features[feature]||{
+label:"Open Feature",
+url:"#"
+};
 }
 
 function openFeature(feature){
-const data=getFeatureLabel(feature);
-if(data.url&&data.url!=="#")window.location.href=data.url;
+
+const data=
+getFeatureData(feature);
+
+if(data.url!=="#"){
+window.location.href=data.url;
+}
 }
 
-function detectExtremeDistress(text){
-const normalized=text.toLowerCase().replace(/[’]/g,"'");
-const patterns=[
-/\b(i|i'm|i am|i feel|i want|i wanna)\s+(want to|wanna|feel like|am going to|need to)?\s*(die|kill myself|end my life|take my life)\b/,
- /\b(kill myself|kill my self|suicide|end it all|end my life|take my life)\b/,
- /\b(don't want to live|dont want to live|can't go on|cant go on)\b/,
- /\b(i can't take this anymore|i cant take this anymore)\b/,
- /\b(feel like dying|want to disappear forever|no reason to live|better off dead)\b/,
- /\b(hurt myself|harm myself|self harm|self-harm)\b/
-];
-return patterns.some(pattern=>pattern.test(normalized));
+function showTyping(){
+
+const typing=
+document.createElement("div");
+
+typing.id="typingIndicator";
+typing.className="typing";
+
+typing.innerHTML=
+"<span></span><span></span><span></span>";
+
+chatBox.appendChild(typing);
+
+chatBox.scrollTop=
+chatBox.scrollHeight;
 }
 
-function detectMood(text){
-const t=text.toLowerCase().replace(/[’]/g,"'").trim();
+function removeTyping(){
 
-const negativePatterns=[
-/\bi\s*(do not|don't|dont|no longer)\s+(feel|feeling)\s+(good|great|happy|wonderful|amazing|fine|okay|ok)\b/,
- /\bi\s*(am not|ain't|amn't)\s+(happy|good|great|fine|okay|ok)\b/,
- /\bnot\s+(happy|good|great|fine|okay|ok)\b/,
- /\bfeel(ing)?\s+(bad|low|down|sad|terrible|awful|horrible|empty|lonely|miserable|hopeless)\b/,
- /\bi\s*(do not|don't|dont)\s+feel\s+(well|okay|fine)\b/,
- /\bnot\s+feeling\s+(well|good|great|happy|okay|fine)\b/
-];
+const typing=
+document.getElementById(
+"typingIndicator"
+);
 
-if(negativePatterns.some(pattern=>pattern.test(t)))return"sad";
+if(typing){
+typing.remove();
+}
+}
 
-const stressedPatterns=[
-/\b(stressed|stress|overwhelmed|overwhelming|anxious|anxiety|panic|panicking|worried|worry|nervous|too much|exhausted|burnt out|burnout|tension)\b/,
- /\bunder\s+(a lot of\s+)?pressure\b/,
- /\btoo\s+much\s+on\s+my\s+mind\b/,
- /\bcan't\s+handle\s+(all\s+)?this\b/,
- /\bcannot\s+handle\s+(all\s+)?this\b/
-];
+function detectCrisis(text){
 
-if(stressedPatterns.some(pattern=>pattern.test(t)))return"stressed";
+const t=
+text
+.toLowerCase()
+.replace(/[’]/g,"'")
+.trim();
 
-const angryPatterns=[
-/\b(angry|mad|furious|irritated|annoyed|frustrated|frustrating|rage|raging|fed up|hate this)\b/,
- /\bthis\s+is\s+so\s+annoying\b/,
- /\bthis\s+is\s+driving\s+me\s+crazy\b/
-];
-
-if(angryPatterns.some(pattern=>pattern.test(t)))return"angry";
-
-const sadPatterns=[
-/\b(sad|down|depressed|cry|crying|lonely|hopeless|unhappy|heartbroken|miserable|empty|hurt|feeling low|bad day)\b/,
- /\bi\s+feel\s+(bad|low|down|sad|terrible|awful|horrible|empty|lonely)\b/,
- /\bi\s+don't\s+feel\s+(well|good|great|okay|fine)\b/,
- /\bi\s+dont\s+feel\s+(well|good|great|okay|fine)\b/,
- /\bi\s+am\s+not\s+feeling\s+(good|well|great|okay|fine)\b/,
- /\bi'm\s+not\s+feeling\s+(good|well|great|okay|fine)\b/
-];
-
-if(sadPatterns.some(pattern=>pattern.test(t)))return"sad";
-
-const happyPatterns=[
-/\b(happy|excited|awesome|amazing|wonderful|joyful|glad|fantastic|love it|proud|thrilled|yay)\b/,
- /\bi\s+feel\s+(good|great|happy|wonderful|amazing|fantastic)\b/,
- /\bi'm\s+(good|great|happy|fine|okay|excited)\b/,
- /\bi\s+am\s+(good|great|happy|fine|okay|excited)\b/,
- /\bfeeling\s+(good|great|happy|wonderful|amazing|fantastic)\b/
+const directPatterns=[
+/\bi want to die\b/,
+ /\bi wanna die\b/,
+ /\bi want to kill myself\b/,
+ /\bi wanna kill myself\b/,
+ /\bi am going to kill myself\b/,
+ /\bi'm going to kill myself\b/,
+ /\bi might kill myself\b/,
+ /\bi plan to kill myself\b/,
+ /\bi am suicidal\b/,
+ /\bi'm suicidal\b/,
+ /\bkill myself\b/,
+ /\bend my life\b/,
+ /\btake my own life\b/,
+ /\bhurt myself\b/,
+ /\bharm myself\b/,
+ /\bself[- ]harm\b/
 ];
 
-if(happyPatterns.some(pattern=>pattern.test(t)))return"happy";
+const indirectPatterns=[
+/\bi don't want to be here anymore\b/,
+ /\bi do not want to be here anymore\b/,
+ /\bi wish i wasn't alive\b/,
+ /\bi wish i was dead\b/,
+ /\bi wish i were dead\b/,
+ /\beveryone would be better without me\b/,
+ /\bpeople would be better off without me\b/,
+ /\bno one would miss me\b/,
+ /\bi can't do this anymore\b/,
+ /\bi cannot do this anymore\b/,
+ /\bthere's no point anymore\b/,
+ /\bthere is no point anymore\b/,
+ /\bi can't live like this\b/,
+ /\bi cannot live like this\b/,
+ /\bi don't want to wake up\b/,
+ /\bi do not want to wake up\b/,
+ /\bi want everything to stop\b/
+];
 
-return"neutral";
-}
-
-function detectCasualConversation(text){
-const t=text.toLowerCase().trim();
-if(/^(hi|hello|hey|hii|hiii|good morning|good afternoon|good evening|howdy)\b/.test(t))return"greeting";
-if(/\bhow are you\b|\bhow're you\b/.test(t))return"howAreYou";
-if(/\b(thank you|thanks|thx|appreciate it)\b/.test(t))return"thanks";
-if(/\b(bye|goodbye|see you|see ya|talk later|good night)\b/.test(t))return"goodbye";
-if(/\bhow was my day\b|\bhow is my day\b|\bhow's my day\b|\bhow was your day\b|\btell me about my day\b/.test(t))return"day";
-if(/\bwhat('?s| is) your name\b|\bwho are you\b|\bwhat should i call you\b/.test(t))return"name";
-if(/\b(you're nice|you are nice|you're helpful|you are helpful|good bot|i like you|love you)\b/.test(t))return"compliment";
-if(/\b(tell me a joke|make me laugh|joke)\b/.test(t))return"joke";
-return"";
-}
-
-function extractUserName(text){
-const t=text.trim();
-let match=t.match(/^(?:my name is|call me)\s+([a-zA-Z][a-zA-Z\s'-]{1,25})$/i);
-if(!match)match=t.match(/^i(?:'m| am)\s+([a-zA-Z][a-zA-Z\s'-]{1,25})$/i);
-if(!match)return"";
-const name=match[1].trim();
-const rejected=["sad","happy","tired","stressed","angry","fine","good","bad","okay","ok","anxious","worried","lonely","depressed","frustrated","mad","excited","bored","confused","scared","upset"];
-if(rejected.includes(name.toLowerCase()))return"";
-return name.split(/\s+/).map(word=>word.charAt(0).toUpperCase()+word.slice(1).toLowerCase()).join(" ");
-}
-
-function detectIntent(text){
-const t=text.toLowerCase().trim();
-if(/^(yes|yeah|yep|sure|okay|ok|alright|please|do it|go ahead)$/.test(t))return"confirmation";
-if(/^(no|nope|not really|nah)$/.test(t))return"negative";
-if(/\b(do you remember|remember my name|what('?s| is) my name|did i tell you my name)\b/.test(t))return"memory";
-if(/\b(what should i do|what can i do|what do i do|any advice|give me advice|help me)\b/.test(t))return"advice";
-if(/\b(tell me more|more about that|explain that|continue|go on|and then|what else)\b/.test(t))return"continue";
-if(/\b(why|how come)\b/.test(t)&&conversationContext.lastMood!=="neutral")return"why";
-if(/\b(still|again|yet)\b/.test(t)&&detectMood(t)!=="neutral")return"followupMood";
-if(/\b(i feel better|feeling better|i'm better|i am better|much better|calmer now|i'm okay now|i am okay now)\b/.test(t))return"improvement";
-if(/\b(this|that|it|something|everything)\b/.test(t)&&conversationContext.lastTopic)return"contextReference";
-return"";
+if(
+directPatterns.some(
+pattern=>pattern.test(t)
+)
+){
+return true;
 }
 
-function rememberTopic(text,mood){
-const t=text.toLowerCase();
-if(mood!=="neutral"){
-conversationContext.lastTopic=mood+" feelings";
-return;
-}
-if(/\b(exam|exams|test|assignment|college|class|study|studying|project|deadline)\b/.test(t)){
-conversationContext.lastTopic="studies or academic work";
-return;
-}
-if(/\b(work|job|boss|office|career)\b/.test(t)){
-conversationContext.lastTopic="work";
-return;
-}
-if(/\b(friend|friendship|relationship|family|parent|parents|brother|sister)\b/.test(t)){
-conversationContext.lastTopic="relationships";
-return;
-}
-if(/\b(sleep|sleeping|insomnia|awake)\b/.test(t)){
-conversationContext.lastTopic="sleep";
-return;
-}
-if(/\b(money|financial|finance|debt)\b/.test(t)){
-conversationContext.lastTopic="money";
-return;
-}
-conversationContext.lastTopic="what you are currently dealing with";
+if(
+indirectPatterns.some(
+pattern=>pattern.test(t)
+)
+){
+return true;
 }
 
-function getMoodSuggestion(mood){
-if(mood==="sad")return{message:"Since you’ve been feeling low, you could write down what’s bothering you or put on something calming for a little while.",features:["journal","calmingSounds"]};
-if(mood==="stressed")return{message:"Since you’ve been feeling stressed, I’d suggest taking a short breathing break and giving your mind a few quiet minutes.",features:["breathing","calmingSounds"]};
-if(mood==="angry")return{message:"Since you’re feeling frustrated, giving yourself some space before reacting may help. You could also doodle or take a few slow breaths.",features:["breathing","doodle"]};
-if(mood==="happy")return{message:"Since you’re feeling good, you could capture the moment in your journal or spend a little time doing something creative.",features:["journal","doodle"]};
-return{message:"You could take a quiet moment, write down what is on your mind, or simply keep talking to me.",features:["journal"]};
+if(
+conversationContext.crisisContext &&
+(
+/\bi want to disappear\b/.test(t)||
+/\bi want to go away\b/.test(t)||
+/\bi can't go on\b/.test(t)||
+/\bi cannot go on\b/.test(t)||
+/\bi'm done\b/.test(t)||
+/\bi am done\b/.test(t)
+)
+){
+return true;
 }
 
-function getContextualResponse(userText){
-const intent=detectIntent(userText);
-const mood=detectMood(userText);
-const name=extractUserName(userText);
-
-if(name){
-conversationContext.userName=name;
-conversationContext.lastIntent="nameProvided";
-return{
-message:`It’s nice to meet you, ${name}. I’ll remember your name during our conversations here. What would you like to talk about?`,
-features:[]
-};
+return false;
 }
 
-if(intent==="memory"){
-conversationContext.lastIntent="memory";
-if(conversationContext.userName){
-return{message:`Yes. You told me your name is ${conversationContext.userName}.`,features:[]};
-}
-return{message:"You haven’t told me your name yet. If you’d like, you can say something like “My name is Alex.”",features:[]};
-}
+function updateContext(text){
 
-if(intent==="confirmation"&&conversationContext.lastSuggestion){
-const label=getFeatureLabel(conversationContext.lastSuggestion).label;
-return{
-message:`Of course. Let’s go with ${label}. You can open it using the button below.`,
-features:[conversationContext.lastSuggestion]
-};
-}
+const lower=
+text.toLowerCase();
 
-if(intent==="improvement"){
-conversationContext.lastMood="happy";
-conversationContext.moodHistory.push("improving");
-return{
-message:"I’m really glad to hear that. Even a small improvement matters. Try to give yourself credit for getting through the difficult moment.",
-features:["journal","doodle"]
-};
-}
-
-if(intent==="followupMood"){
-conversationContext.lastMood=mood;
-conversationContext.moodHistory.push(mood);
-rememberTopic(userText,mood);
-if(mood==="stressed")return{message:"It sounds like the stress is still hanging around. Let’s not try to solve everything at once. What is the biggest thing weighing on you right now?",features:["breathing","calmingSounds"]};
-if(mood==="sad")return{message:"I hear you. If the sadness is still there, you don’t have to force it away. What part of it feels hardest right now?",features:["journal","calmingSounds"]};
-if(mood==="angry")return{message:"You’re still feeling frustrated, and that’s okay to talk about. What is continuing to bother you?",features:["breathing","doodle"]};
-if(mood==="happy")return{message:"I’m glad the good feeling is still there. What has been making you feel this way?",features:["journal","doodle"]};
-}
-
-if(intent==="advice"){
-const suggestion=getMoodSuggestion(conversationContext.lastMood);
-return{message:`Based on what you’ve been telling me, ${suggestion.message.toLowerCase().charAt(0).toUpperCase()+suggestion.message.slice(1)}`,features:suggestion.features};
-}
-
-if(intent==="continue"||intent==="why"||intent==="contextReference"){
-const moodToUse=conversationContext.lastMood;
-if(moodToUse!=="neutral"){
-if(moodToUse==="sad")return{message:"When you’re feeling low, it can help to understand what is underneath the feeling instead of judging yourself for having it. If you want, tell me what happened before you started feeling this way.",features:["journal"]};
-if(moodToUse==="stressed")return{message:"Stress often becomes stronger when several things feel urgent at once. We can separate them and look at one thing at a time. What feels most urgent right now?",features:["breathing"]};
-if(moodToUse==="angry")return{message:"Anger often points toward something that felt unfair, hurtful or frustrating. If you want, tell me what happened and we can unpack it.",features:["doodle"]};
-if(moodToUse==="happy")return{message:"Let’s keep talking about the good part. What exactly made you feel happy or proud?",features:["journal"]};
-}
-return{message:`You were talking about ${conversationContext.lastTopic||"what has been on your mind"}. Tell me more about that and I’ll follow along.`,features:[]};
-}
-
-if(mood!=="neutral"){
-conversationContext.lastMood=mood;
-conversationContext.moodHistory.push(mood);
-if(conversationContext.moodHistory.length>10)conversationContext.moodHistory.shift();
-conversationContext.lastIntent="mood";
-rememberTopic(userText,mood);
-if(mood==="sad")return{message:randomResponse(aiDatabase.sad),features:["journal","calmingSounds"]};
-if(mood==="stressed")return{message:randomResponse(aiDatabase.stressed),features:["breathing","calmingSounds"]};
-if(mood==="happy")return{message:randomResponse(aiDatabase.happy),features:["journal","doodle"]};
-if(mood==="angry")return{message:randomResponse(aiDatabase.angry),features:["breathing","doodle"]};
-}
-
-conversationContext.lastIntent="neutral";
-return{message:randomResponse(aiDatabase.neutral),features:[]};
-}
-
-function getBotResponse(userText){
-if(detectExtremeDistress(userText)){
+if(
+detectCrisis(text)
+){
+conversationContext.crisisContext=true;
+conversationContext.lastMood="crisis";
 conversationContext.lastIntent="crisis";
-return{
-type:"crisis",
-message:"I’m really sorry you’re feeling this much pain right now. You matter, and I don’t want you to face this moment alone. If you might hurt yourself or are in immediate danger, please call your local emergency services now or go to the nearest hospital. If you can, please move toward a trusted person and tell them clearly that you need help right now.",
-crisisMessage:"India support: For immediate emergencies, call 112. For 24/7 mental-health support, Tele-MANAS can be reached at 14416 or 1-800-891-4416. If possible, please stay with someone you trust while you seek help.",
-features:["breathing","journal"]
-};
-}
-const mood=detectMood(userText);
-if(mood!=="neutral"){
-conversationContext.lastMood=mood;
-conversationContext.moodHistory.push(mood);
-if(conversationContext.moodHistory.length>10){
-conversationContext.moodHistory.shift();
-}
-rememberTopic(userText,mood);
-conversationContext.lastIntent="mood";
-if(mood==="sad"){
-return{
-message:randomResponse(aiDatabase.sad),
-features:["journal","calmingSounds"]
-};
-}
-if(mood==="stressed"){
-return{
-message:randomResponse(aiDatabase.stressed),
-features:["breathing","calmingSounds"]
-};
-}
-if(mood==="happy"){
-return{
-message:randomResponse(aiDatabase.happy),
-features:["journal","doodle"]
-};
-}
-if(mood==="angry"){
-return{
-message:randomResponse(aiDatabase.angry),
-features:["breathing","doodle"]
-};
-}
-}
-const casual=detectCasualConversation(userText);
-if(casual){
-conversationContext.lastIntent=casual;
-if(casual==="greeting"){
-return{message:randomResponse(casualResponses.greeting),features:[]};
-}
-if(casual==="howAreYou"){
-return{message:randomResponse(casualResponses.howAreYou),features:[]};
-}
-if(casual==="thanks"){
-return{message:randomResponse(casualResponses.thanks),features:[]};
-}
-if(casual==="goodbye"){
-return{message:randomResponse(casualResponses.goodbye),features:[]};
-}
-if(casual==="day"){
-return{message:randomResponse(casualResponses.day),features:[]};
-}
-if(casual==="name"){
-return{message:randomResponse(casualResponses.name),features:[]};
-}
-if(casual==="compliment"){
-return{message:randomResponse(casualResponses.compliment),features:[]};
-}
-if(casual==="joke"){
-return{message:randomResponse(casualResponses.joke),features:[]};
-}
-}
-return getContextualResponse(userText);
+conversationContext.conversationStage="safety";
+return;
 }
 
-chatForm.addEventListener("submit",event=>{
-event.preventDefault();
-const message=userInput.value.trim();
+if(
+/\b(exam|exams|test|assignment|college|class|study|studying|project|deadline)\b/.test(lower)
+){
+conversationContext.lastTopic=
+"studies or academic work";
+}
+
+else if(
+/\b(work|job|boss|office|career)\b/.test(lower)
+){
+conversationContext.lastTopic="work";
+}
+
+else if(
+/\b(friend|friendship|relationship|family|parent|parents|brother|sister)\b/.test(lower)
+){
+conversationContext.lastTopic="relationships";
+}
+
+else if(
+/\b(sleep|sleeping|insomnia|awake)\b/.test(lower)
+){
+conversationContext.lastTopic="sleep";
+}
+
+else if(
+/\b(money|financial|finance|debt)\b/.test(lower)
+){
+conversationContext.lastTopic="money";
+}
+
+const emotions=[
+{
+name:"worthless",
+words:[
+"burden",
+"worthless",
+"useless",
+"not good enough"
+]
+},
+{
+name:"lonely",
+words:[
+"lonely",
+"alone",
+"isolated",
+"nobody understands"
+]
+},
+{
+name:"anxious",
+words:[
+"anxious",
+"anxiety",
+"panic",
+"panicking",
+"worried",
+"nervous"
+]
+},
+{
+name:"overwhelmed",
+words:[
+"overwhelmed",
+"too much",
+"can't handle",
+"cannot handle"
+]
+},
+{
+name:"angry",
+words:[
+"angry",
+"furious",
+"mad",
+"irritated",
+"annoyed"
+]
+},
+{
+name:"frustrated",
+words:[
+"frustrated",
+"fed up"
+]
+},
+{
+name:"guilty",
+words:[
+"guilty",
+"guilt",
+"my fault",
+"blame myself"
+]
+},
+{
+name:"hopeless",
+words:[
+"hopeless",
+"no hope",
+"nothing will change"
+]
+},
+{
+name:"depressed",
+words:[
+"depressed",
+"depression"
+]
+},
+{
+name:"sad",
+words:[
+"sad",
+"upset",
+"crying",
+"heartbroken",
+"miserable",
+"empty"
+]
+},
+{
+name:"tired",
+words:[
+"tired",
+"exhausted",
+"drained",
+"burnt out",
+"burned out"
+]
+},
+{
+name:"happy",
+words:[
+"happy",
+"great",
+"amazing",
+"wonderful",
+"glad"
+]
+},
+{
+name:"excited",
+words:[
+"excited",
+"thrilled",
+"can't wait"
+]
+}
+];
+
+for(const emotion of emotions){
+
+if(
+emotion.words.some(
+word=>lower.includes(word)
+)
+){
+
+conversationContext.lastMood=
+emotion.name;
+
+conversationContext.moodHistory.push(
+emotion.name
+);
+
+conversationContext.moodHistory=
+conversationContext.moodHistory.slice(-10);
+
+break;
+}
+}
+
+conversationContext.recentUserMessages.push(text);
+
+conversationContext.recentUserMessages=
+conversationContext.recentUserMessages.slice(-8);
+
+conversationContext.messageCount=
+localMessages.length;
+}
+
+async function getAIResponse(message){
+
+try{
+
+const history=
+localMessages
+.slice(-14)
+.map(item=>({
+role:
+item.sender==="bot"
+?"assistant"
+:"user",
+content:item.text
+}));
+
+const response=
+await fetch(
+"/api/ai",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+message,
+history,
+context:{
+...conversationContext,
+sessionId:currentSessionId
+}
+})
+}
+);
+
+const data=
+await response.json();
+
+if(
+!response.ok ||
+!data.response
+){
+throw new Error(
+data.error||
+"AI request failed"
+);
+}
+
+return data.response;
+
+}catch(error){
+
+console.error(
+"MindEase AI error:",
+error
+);
+
+return null;
+}
+
+}
+
+function localCrisisResponse(){
+
+return "I'm really sorry you're hurting this much. I'm taking what you just said seriously. Please don't stay alone with this right now. If you can, move somewhere safe and contact someone you trust so they can stay with you.\n\nIf you think you might hurt yourself or you're in immediate danger, call 112 in India or go to the nearest emergency department. You can also contact Tele-MANAS at 14416 or 1-800-891-4416 for 24/7 mental-health support.";
+}
+
+async function handleMessage(message){
+
 if(!message)return;
-displayMessage(message,"user");
-userInput.value="";
-userInput.focus();
-setTimeout(()=>{
-const response=getBotResponse(message);
-displayMessage(response.message,"bot",response.features||[],response.type||"");
-if(response.type==="crisis")displayMessage(response.crisisMessage,"bot",[], "crisis");
-},450);
-});
 
-newChatBtn.addEventListener("click",()=>{
-if(localMessages.some(message=>message.sender==="user"))updateCurrentSession();
+displayMessage(
+message,
+"user"
+);
+
+updateContext(message);
+
+userInput.value="";
+sendButton.disabled=true;
+
+if(detectCrisis(message)){
+
+conversationContext.crisisContext=true;
+
+displayMessage(
+localCrisisResponse(),
+"bot",
+[],
+"crisis"
+);
+
+sendButton.disabled=false;
+userInput.focus();
+return;
+}
+
+showTyping();
+
+const response=
+await getAIResponse(message);
+
+removeTyping();
+
+if(response){
+
+displayMessage(
+response,
+"bot"
+);
+
+}else{
+
+displayMessage(
+"Sorry, I'm having trouble connecting right now. Please try again in a moment.",
+"bot"
+);
+}
+
+sendButton.disabled=false;
+userInput.focus();
+}
+
+chatForm.addEventListener(
+"submit",
+async event=>{
+
+event.preventDefault();
+
+const message=
+userInput.value.trim();
+
+if(
+!message||
+sendButton.disabled
+){
+return;
+}
+
+await handleMessage(message);
+}
+);
+
+newChatBtn.addEventListener(
+"click",
+()=>{
+
+if(
+localMessages.some(
+message=>message.sender==="user"
+)
+){
+updateCurrentSession();
+}
+
 createSession();
 userInput.focus();
-});
+}
+);
 
-exportBtn.addEventListener("click",()=>{
+exportBtn.addEventListener(
+"click",
+()=>{
+
 if(!localMessages.length){
-alert("There is no conversation to export yet.");
+
+alert(
+"There is no conversation to export yet."
+);
+
 return;
 }
-const text=localMessages.map(message=>{
-const sender=message.sender==="user"?"YOU":"MINDEASE AI";
-return`${sender}: ${message.text}`;
-}).join("\n\n");
-const blob=new Blob([text],{type:"text/plain"});
-const url=URL.createObjectURL(blob);
-const link=document.createElement("a");
-link.href=url;
-link.download=`mindease_chat_${Date.now()}.txt`;
-link.click();
-URL.revokeObjectURL(url);
-});
 
-clearBtn.addEventListener("click",()=>{
-if(!confirm("Delete all saved MindEase conversations? This cannot be undone."))return;
-localStorage.removeItem(STORAGE_KEY);
+const text=
+localMessages
+.map(message=>{
+
+const sender=
+message.sender==="user"
+?"YOU"
+:"MINDEASE AI";
+
+return`${sender}: ${message.text}`;
+
+})
+.join("\n\n");
+
+const blob=
+new Blob(
+[text],
+{type:"text/plain"}
+);
+
+const url=
+URL.createObjectURL(blob);
+
+const link=
+document.createElement("a");
+
+link.href=url;
+
+link.download=
+`mindease_chat_${Date.now()}.txt`;
+
+link.click();
+
+URL.revokeObjectURL(url);
+}
+);
+
+clearBtn.addEventListener(
+"click",
+()=>{
+
+const confirmed=
+confirm(
+"Delete all saved MindEase conversations? This cannot be undone."
+);
+
+if(!confirmed)return;
+
+localStorage.removeItem(
+STORAGE_KEY
+);
+
 chatSessions=[];
 currentSessionId=null;
 localMessages=[];
-conversationContext=createContext();
-chatHistory.innerHTML="";
-chatBox.innerHTML="";
-createSession();
-});
 
-fileInput.addEventListener("change",()=>{
-const file=fileInput.files[0];
+createSession();
+renderHistory();
+}
+);
+
+fileInput.addEventListener(
+"change",
+()=>{
+
+const file=
+fileInput.files[0];
+
 if(!file)return;
-displayMessage(`You shared an image: ${file.name}`,"user");
-setTimeout(()=>{
-displayMessage("Thanks for sharing it. I can see that you uploaded an image, but this version of MindEase does not have image understanding connected yet. If you tell me what the image means or what you want me to notice, I can still talk it through with you.", "bot");
-},450);
+
+displayMessage(
+`You shared an image: ${file.name}`,
+"user"
+);
+
+displayMessage(
+"Thanks for sharing it. Image understanding isn't connected to MindEase yet, but you can tell me what you'd like me to notice or talk about.",
+"bot"
+);
+
 fileInput.value="";
-});
+}
+);
+
+userInput.addEventListener(
+"keydown",
+event=>{
+
+if(
+event.key==="Enter" &&
+!event.shiftKey
+){
+
+event.preventDefault();
+
+chatForm.requestSubmit();
+}
+}
+);
 
 loadSessions();
 
 if(chatSessions.length){
-const latest=chatSessions[0];
-if(latest.messages&&latest.messages.some(message=>message.sender==="user")){
+
+const latest=
+chatSessions[0];
+
+if(
+latest.messages &&
+latest.messages.some(
+message=>message.sender==="user"
+)
+){
+
 loadSession(latest.id);
+
 }else{
-chatSessions=chatSessions.filter(session=>session.messages&&session.messages.length);
-if(chatSessions.length)loadSession(chatSessions[0].id);
-else createSession();
+
+createSession();
 }
+
 }else{
+
 createSession();
 }
 
 renderHistory();
+
 userInput.focus();
 </script>
+
 </body>
 </html>
