@@ -1,161 +1,1740 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Creative Doodle Pad</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-body { font-family: 'Poppins', sans-serif; background:#fff5e6; margin:0; text-align:center; }
-header { padding:25px; }
-header h1 { font-size:36px; color:#b29b80; }
-header p { font-size:18px; color:#4f4f4f; }
-#toolbar { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-#toolbar select, #toolbar button, #toolbar input[type=color] { padding:8px 12px; border-radius:12px; border:1px solid #ccc; font-size:14px; cursor:pointer; }
-#canvasContainer { display:flex; justify-content:center; margin-bottom:20px; }
-canvas { border:2px solid #b29b80; border-radius:12px; background:white; touch-action:none; }
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#fff5e6;
+    margin:0;
+    text-align:center;
+    color:#4f4f4f;
+}
+
+/* HEADER */
+
+header{
+    padding:25px 20px 15px;
+}
+
+header h1{
+    font-size:36px;
+    color:#b29b80;
+    margin:0;
+}
+
+header p{
+    font-size:16px;
+    margin-top:8px;
+    color:#666;
+}
+
+
+/* TOOLBAR */
+
+#toolbar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    max-width:1000px;
+    margin:10px auto 18px;
+    padding:15px;
+
+    background:rgba(255,255,255,0.75);
+
+    border:1px solid #eadbc8;
+
+    border-radius:18px;
+
+    box-shadow:
+    0 8px 25px rgba(130,100,70,0.08);
+}
+
+
+/* CONTROLS */
+
+.tool-group{
+    display:flex;
+    align-items:center;
+    gap:7px;
+
+    padding:5px 8px;
+}
+
+label{
+    font-size:13px;
+    font-weight:500;
+}
+
+
+/* BUTTONS */
+
+button,
+select{
+    padding:9px 13px;
+
+    border-radius:10px;
+
+    border:1px solid #d8c7b3;
+
+    background:#ffffff;
+
+    font-family:'Poppins',sans-serif;
+
+    font-size:13px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+}
+
+
+button:hover,
+select:hover{
+    transform:translateY(-1px);
+
+    background:#fffaf5;
+}
+
+
+button.active{
+    background:#b29b80;
+
+    color:white;
+
+    border-color:#b29b80;
+}
+
+
+/* COLOR PICKER */
+
+input[type="color"]{
+
+    width:42px;
+
+    height:36px;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:2px;
+
+    cursor:pointer;
+
+    background:white;
+
+}
+
+
+/* BRUSH SLIDER */
+
+input[type="range"]{
+
+    width:90px;
+
+    accent-color:#b29b80;
+
+}
+
+
+#brushValue{
+
+    font-size:12px;
+
+    min-width:25px;
+
+}
+
+
+/* CANVAS AREA */
+
+#canvasContainer{
+
+    display:flex;
+
+    justify-content:center;
+
+    padding:0 20px 30px;
+
+}
+
+
+.canvas-wrapper{
+
+    position:relative;
+
+    width:min(900px,95vw);
+
+}
+
+
+canvas{
+
+    width:100%;
+
+    height:auto;
+
+    display:block;
+
+    background:white;
+
+    border:2px solid #b29b80;
+
+    border-radius:16px;
+
+    touch-action:none;
+
+    box-shadow:
+    0 12px 35px rgba(120,90,60,0.12);
+
+    cursor:crosshair;
+
+}
+
+
+/* STATUS */
+
+#status{
+
+    font-size:12px;
+
+    color:#888;
+
+    margin-top:8px;
+
+}
+
+
+/* RESPONSIVE */
+
+@media(max-width:600px){
+
+    header h1{
+        font-size:28px;
+    }
+
+    header p{
+        font-size:14px;
+    }
+
+    #toolbar{
+        gap:5px;
+        padding:10px;
+    }
+
+    button,
+    select{
+        font-size:11px;
+        padding:8px;
+    }
+
+}
+
 </style>
+
 </head>
+
 <body>
 
+<!-- HEADER -->
+
 <header>
-  <h1>Creative Doodle Pad</h1>
-  <p>Draw, color, add shapes & stickers, and save your masterpiece!</p>
+
+<h1>Creative Doodle Pad</h1>
+
+<p>
+Draw, sketch, color and express yourself freely.
+Your canvas is yours to create on.
+</p>
+
 </header>
 
+<!-- TOOLBAR -->
+
 <div id="toolbar">
-  <label>Color: <input type="color" id="colorPicker" value="#b29b80"></label>
-  <label>Brush: 
-    <select id="brushSize">
-      <option value="2">Small</option>
-      <option value="5" selected>Medium</option>
-      <option value="10">Large</option>
-      <option value="20">XL</option>
-    </select>
-  </label>
-  <button id="eraserBtn">Eraser</button>
-  <button id="clearBtn">Clear</button>
-  <button id="saveBtn">Save</button>
-  <button id="rainbowBtn">🌈 Rainbow Brush</button>
-  <select id="shapes">
-    <option value="">Add Shape</option>
-    <option value="circle">Circle</option>
-    <option value="square">Square</option>
-    <option value="star">Star</option>
-  </select>
-  <select id="stickers">
-    <option value="">Add Sticker</option>
-    <option value="😊">😊</option>
-    <option value="🌸">🌸</option>
-    <option value="🌈">🌈</option>
-    <option value="✨">✨</option>
-  </select>
+
+<!-- COLOR -->
+
+<div class="tool-group">
+
+<label>Color</label>
+
+<input
+type="color"
+id="colorPicker"
+value="#b29b80">
+
 </div>
 
+<!-- BRUSH SIZE -->
+
+<div class="tool-group">
+
+<label>Brush</label>
+
+<input
+type="range"
+id="brushSize"
+min="1"
+max="40"
+value="6">
+
+<span id="brushValue">6</span>
+
+</div>
+
+<!-- DRAWING TOOLS -->
+
+<div class="tool-group">
+
+<button id="penBtn" class="active">
+✏ Pen
+</button>
+
+<button id="eraserBtn">
+⌫ Eraser
+</button>
+
+<button id="rainbowBtn">
+🌈 Rainbow
+</button>
+
+</div>
+
+<!-- SHAPES -->
+
+<div class="tool-group">
+
+<select id="shapes">
+
+<option value="">
+Shapes
+</option>
+
+<option value="circle">
+Circle
+</option>
+
+<option value="square">
+Square
+</option>
+
+<option value="star">
+Star
+</option>
+
+</select>
+
+</div>
+
+<!-- STICKERS -->
+
+<div class="tool-group">
+
+<select id="stickers">
+
+<option value="">
+Stickers
+</option>
+
+<option value="😊">
+😊
+</option>
+
+<option value="🌸">
+🌸
+</option>
+
+<option value="🌈">
+🌈
+</option>
+
+<option value="✨">
+✨
+</option>
+
+<option value="❤️">
+❤️
+</option>
+
+<option value="☀️">
+☀️
+</option>
+
+</select>
+
+</div>
+
+<!-- CANVAS BACKGROUND -->
+
+<div class="tool-group">
+
+<label>Background</label>
+
+<input
+type="color"
+id="bgColor"
+value="#ffffff">
+
+</div>
+
+<!-- HISTORY -->
+
+<div class="tool-group">
+
+<button id="undoBtn">
+↶ Undo
+</button>
+
+<button id="redoBtn">
+↷ Redo
+</button>
+
+</div>
+
+<!-- ACTIONS -->
+
+<div class="tool-group">
+
+<button id="clearBtn">
+🗑 Clear
+</button>
+
+<button id="saveBtn">
+💾 Save
+</button>
+
+</div>
+
+</div>
+
+<!-- CANVAS -->
+
 <div id="canvasContainer">
-  <canvas id="doodleCanvas" width="800" height="500"></canvas>
+
+<div class="canvas-wrapper">
+
+<canvas
+id="doodleCanvas"
+width="1000"
+height="600"> </canvas>
+
+<div id="status">
+✏ Pen mode
+</div>
+
+</div>
+
 </div>
 
 <script>
-const canvas = document.getElementById('doodleCanvas');
-const ctx = canvas.getContext('2d');
-let painting = false;
-let brushColor = document.getElementById('colorPicker').value;
-let brushSize = document.getElementById('brushSize').value;
-let erasing = false;
-let rainbow = false;
+
+
+/* =========================
+
+CANVAS SETUP
+
+========================= */
+
+
+const canvas =
+document.getElementById("doodleCanvas");
+
+
+const ctx =
+canvas.getContext("2d");
+
+
+
+let drawing = false;
+
+
+let currentTool = "pen";
+
+
+let brushColor =
+document.getElementById("colorPicker").value;
+
+
+let brushSize = 6;
+
+
 let hue = 0;
 
-// Canvas events
-canvas.addEventListener('mousedown', () => painting=true);
-canvas.addEventListener('mouseup', ()=> {painting=false; ctx.beginPath();});
-canvas.addEventListener('mouseleave', ()=> {painting=false; ctx.beginPath();});
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('touchstart', e=>{painting=true; draw(e); e.preventDefault();});
-canvas.addEventListener('touchend', ()=>{painting=false; ctx.beginPath();});
-canvas.addEventListener('touchmove', draw);
+
+let startX = 0;
+
+
+let startY = 0;
+
+
+let snapshot = null;
+
+
+let selectedShape = "";
+
+
+let selectedSticker = "";
+
+
+/* HISTORY */
+
+
+let history = [];
+
+
+let redoStack = [];
+
+
+/* =========================
+
+INITIAL CANVAS
+
+========================= */
+
+
+function fillBackground(){
+
+    ctx.fillStyle =
+    document.getElementById("bgColor").value;
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+}
+
+
+fillBackground();
+
+
+saveState();
+
+
+
+/* =========================
+
+HISTORY SYSTEM
+
+========================= */
+
+
+function saveState(){
+
+    history.push(
+        canvas.toDataURL()
+    );
+
+    if(history.length > 30){
+
+        history.shift();
+
+    }
+
+    redoStack = [];
+
+}
+
+
+
+function restoreState(data){
+
+    const image =
+    new Image();
+
+
+    image.onload = function(){
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        ctx.drawImage(
+            image,
+            0,
+            0
+        );
+
+    };
+
+
+    image.src = data;
+
+}
+
+
+
+/* =========================
+
+UNDO
+
+========================= */
+
+
+document
+.getElementById("undoBtn")
+.addEventListener(
+"click",
+function(){
+
+    if(history.length <= 1)
+    return;
+
+
+    redoStack.push(
+        history.pop()
+    );
+
+
+    restoreState(
+        history[history.length - 1]
+    );
+
+});
+
+
+
+/* =========================
+
+REDO
+
+========================= */
+
+
+document
+.getElementById("redoBtn")
+.addEventListener(
+"click",
+function(){
+
+    if(
+        redoStack.length === 0
+    )
+    return;
+
+
+    const state =
+    redoStack.pop();
+
+
+    history.push(state);
+
+
+    restoreState(state);
+
+});
+
+
+
+/* =========================
+
+CANVAS POSITION
+
+========================= */
+
+
+function getPosition(e){
+
+    const rect =
+    canvas.getBoundingClientRect();
+
+
+    const scaleX =
+    canvas.width /
+    rect.width;
+
+
+    const scaleY =
+    canvas.height /
+    rect.height;
+
+
+    let clientX;
+    let clientY;
+
+
+    if(e.touches){
+
+        clientX =
+        e.touches[0].clientX;
+
+
+        clientY =
+        e.touches[0].clientY;
+
+    }
+
+    else{
+
+        clientX =
+        e.clientX;
+
+
+        clientY =
+        e.clientY;
+
+    }
+
+
+    return{
+
+        x:
+        (clientX - rect.left)
+        * scaleX,
+
+
+        y:
+        (clientY - rect.top)
+        * scaleY
+
+    };
+
+}
+
+
+
+/* =========================
+
+START DRAWING
+
+========================= */
+
+
+function startDrawing(e){
+
+    e.preventDefault();
+
+
+    const pos =
+    getPosition(e);
+
+
+    startX = pos.x;
+
+
+    startY = pos.y;
+
+
+    drawing = true;
+
+
+    snapshot =
+    ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    if(currentTool === "pen"){
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            pos.x,
+            pos.y
+        );
+
+    }
+
+
+    if(currentTool === "eraser"){
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            pos.x,
+            pos.y
+        );
+
+    }
+
+
+    if(
+        currentTool === "sticker"
+    ){
+
+        placeSticker(
+            pos.x,
+            pos.y
+        );
+
+
+        drawing = false;
+
+
+        saveState();
+
+    }
+
+}
+
+
+
+/* =========================
+
+DRAW
+
+========================= */
+
 
 function draw(e){
-  if(!painting) return;
-  ctx.lineWidth = brushSize;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = erasing ? '#fff' : (rainbow ? `hsl(${hue},100%,50%)` : brushColor);
-  if(rainbow) hue++; if(hue>360) hue=0;
 
-  let x, y;
-  if(e.touches){
-    const rect = canvas.getBoundingClientRect();
-    x = e.touches[0].clientX - rect.left;
-    y = e.touches[0].clientY - rect.top;
-  } else {
-    x = e.offsetX;
-    y = e.offsetY;
-  }
+    if(!drawing)
+    return;
 
-  ctx.lineTo(x,y);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(x,y);
+
+    e.preventDefault();
+
+
+    const pos =
+    getPosition(e);
+
+
+
+    /* PEN */
+
+
+    if(currentTool === "pen"){
+
+
+        ctx.lineWidth =
+        brushSize;
+
+
+        ctx.lineCap =
+        "round";
+
+
+        ctx.lineJoin =
+        "round";
+
+
+        ctx.strokeStyle =
+        brushColor;
+
+
+        ctx.globalCompositeOperation =
+        "source-over";
+
+
+        ctx.lineTo(
+            pos.x,
+            pos.y
+        );
+
+
+        ctx.stroke();
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            pos.x,
+            pos.y
+        );
+
+    }
+
+
+
+    /* RAINBOW */
+
+
+    if(currentTool === "rainbow"){
+
+
+        hue += 3;
+
+
+        if(hue > 360){
+
+            hue = 0;
+
+        }
+
+
+        ctx.lineWidth =
+        brushSize;
+
+
+        ctx.lineCap =
+        "round";
+
+
+        ctx.strokeStyle =
+        `hsl(${hue},100%,50%)`;
+
+
+        ctx.lineTo(
+            pos.x,
+            pos.y
+        );
+
+
+        ctx.stroke();
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            pos.x,
+            pos.y
+        );
+
+    }
+
+
+
+    /* ERASER */
+
+
+    if(currentTool === "eraser"){
+
+
+        ctx.lineWidth =
+        brushSize * 2;
+
+
+        ctx.lineCap =
+        "round";
+
+
+        ctx.globalCompositeOperation =
+        "destination-out";
+
+
+        ctx.lineTo(
+            pos.x,
+            pos.y
+        );
+
+
+        ctx.stroke();
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            pos.x,
+            pos.y
+        );
+
+    }
+
+
+
+    /* SHAPES */
+
+
+    if(
+        currentTool === "shape"
+    ){
+
+
+        ctx.putImageData(
+            snapshot,
+            0,
+            0
+        );
+
+
+        drawShape(
+            startX,
+            startY,
+            pos.x,
+            pos.y
+        );
+
+    }
+
 }
 
-// Toolbar
-document.getElementById('colorPicker').addEventListener('input', e=>{brushColor=e.target.value; rainbow=false;});
-document.getElementById('brushSize').addEventListener('change', e=>brushSize=e.target.value);
-document.getElementById('eraserBtn').addEventListener('click', ()=>{erasing=true; rainbow=false;});
-document.getElementById('clearBtn').addEventListener('click', ()=>ctx.clearRect(0,0,canvas.width,canvas.height));
-document.getElementById('saveBtn').addEventListener('click', ()=>{
-  const link=document.createElement('a');
-  link.download='doodle.png';
-  link.href=canvas.toDataURL();
-  link.click();
-});
-document.getElementById('rainbowBtn').addEventListener('click', ()=>{rainbow=true; erasing=false;});
 
-// Shapes
-document.getElementById('shapes').addEventListener('change', e=>{
-  const shape = e.target.value;
-  if(!shape) return;
-  const centerX = canvas.width/2;
-  const centerY = canvas.height/2;
-  ctx.fillStyle = brushColor;
-  ctx.strokeStyle = brushColor;
-  ctx.lineWidth = 2;
-  if(shape==='circle') ctx.beginPath(), ctx.arc(centerX,centerY,50,0,2*Math.PI), ctx.fill();
-  if(shape==='square') ctx.fillRect(centerX-50,centerY-50,100,100);
-  if(shape==='star'){
-    drawStar(centerX,centerY,5,50,20);
-  }
-  e.target.value = '';
-});
 
-function drawStar(cx,cy,spikes,outer,inner){
-  let rot = Math.PI/2*3;
-  let x=cx,y=cy;
-  const step = Math.PI/spikes;
-  ctx.beginPath();
-  ctx.moveTo(cx,cy-outer);
-  for(let i=0;i<spikes;i++){
-    x = cx + Math.cos(rot)*outer;
-    y = cy + Math.sin(rot)*outer;
-    ctx.lineTo(x,y);
-    rot += step;
-    x = cx + Math.cos(rot)*inner;
-    y = cy + Math.sin(rot)*inner;
-    ctx.lineTo(x,y);
-    rot += step;
-  }
-  ctx.closePath();
-  ctx.fill();
+/* =========================
+
+STOP DRAWING
+
+========================= */
+
+
+function stopDrawing(){
+
+
+    if(!drawing)
+    return;
+
+
+    drawing = false;
+
+
+    ctx.beginPath();
+
+
+    ctx.globalCompositeOperation =
+    "source-over";
+
+
+    saveState();
+
 }
 
-// Stickers
-document.getElementById('stickers').addEventListener('change', e=>{
-  const sticker = e.target.value;
-  if(!sticker) return;
-  ctx.font = '50px Arial';
-  ctx.fillText(sticker, Math.random()*700+50, Math.random()*400+50);
-  e.target.value='';
+
+
+/* =========================
+
+DRAW SHAPES
+
+========================= */
+
+
+function drawShape(
+x1,
+y1,
+x2,
+y2
+){
+
+
+    const width =
+    x2 - x1;
+
+
+    const height =
+    y2 - y1;
+
+
+    ctx.strokeStyle =
+    brushColor;
+
+
+    ctx.fillStyle =
+    brushColor;
+
+
+    ctx.lineWidth = 3;
+
+
+    ctx.globalCompositeOperation =
+    "source-over";
+
+
+
+    /* CIRCLE */
+
+
+    if(
+        selectedShape ===
+        "circle"
+    ){
+
+
+        const radius =
+        Math.sqrt(
+            width * width +
+            height * height
+        );
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            x1,
+            y1,
+            radius,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.stroke();
+
+    }
+
+
+
+    /* SQUARE */
+
+
+    if(
+        selectedShape ===
+        "square"
+    ){
+
+
+        ctx.strokeRect(
+            x1,
+            y1,
+            width,
+            height
+        );
+
+    }
+
+
+
+    /* STAR */
+
+
+    if(
+        selectedShape ===
+        "star"
+    ){
+
+
+        const radius =
+        Math.max(
+            Math.abs(width),
+            Math.abs(height)
+        );
+
+
+        drawStar(
+            x1,
+            y1,
+            5,
+            radius,
+            radius / 2
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+
+DRAW STAR
+
+========================= */
+
+
+function drawStar(
+cx,
+cy,
+spikes,
+outerRadius,
+innerRadius
+){
+
+
+    let rotation =
+    Math.PI / 2 * 3;
+
+
+    let step =
+    Math.PI / spikes;
+
+
+    ctx.beginPath();
+
+
+    for(
+        let i = 0;
+        i < spikes;
+        i++
+    ){
+
+
+        let x =
+        cx +
+        Math.cos(rotation)
+        *
+        outerRadius;
+
+
+        let y =
+        cy +
+        Math.sin(rotation)
+        *
+        outerRadius;
+
+
+        ctx.lineTo(
+            x,
+            y
+        );
+
+
+        rotation += step;
+
+
+        x =
+        cx +
+        Math.cos(rotation)
+        *
+        innerRadius;
+
+
+        y =
+        cy +
+        Math.sin(rotation)
+        *
+        innerRadius;
+
+
+        ctx.lineTo(
+            x,
+            y
+        );
+
+
+        rotation += step;
+
+    }
+
+
+    ctx.closePath();
+
+
+    ctx.stroke();
+
+}
+
+
+
+/* =========================
+
+PLACE STICKER
+
+========================= */
+
+
+function placeSticker(
+x,
+y
+){
+
+
+    if(!selectedSticker)
+    return;
+
+
+    ctx.globalCompositeOperation =
+    "source-over";
+
+
+    ctx.font =
+    "55px Arial";
+
+
+    ctx.textAlign =
+    "center";
+
+
+    ctx.textBaseline =
+    "middle";
+
+
+    ctx.fillText(
+        selectedSticker,
+        x,
+        y
+    );
+
+}
+
+
+
+/* =========================
+
+MOUSE EVENTS
+
+========================= */
+
+
+canvas.addEventListener(
+"mousedown",
+startDrawing
+);
+
+
+canvas.addEventListener(
+"mousemove",
+draw
+);
+
+
+canvas.addEventListener(
+"mouseup",
+stopDrawing
+);
+
+
+canvas.addEventListener(
+"mouseleave",
+stopDrawing
+);
+
+
+
+/* =========================
+
+TOUCH EVENTS
+
+========================= */
+
+
+canvas.addEventListener(
+"touchstart",
+startDrawing,
+{passive:false}
+);
+
+
+canvas.addEventListener(
+"touchmove",
+draw,
+{passive:false}
+);
+
+
+canvas.addEventListener(
+"touchend",
+stopDrawing
+);
+
+
+
+/* =========================
+
+COLOR PICKER
+
+========================= */
+
+
+document
+.getElementById("colorPicker")
+.addEventListener(
+"input",
+function(e){
+
+
+    brushColor =
+    e.target.value;
+
+
+    setTool(
+        "pen",
+        "✏ Pen mode"
+    );
+
 });
+
+
+
+/* =========================
+
+BRUSH SIZE
+
+========================= */
+
+
+document
+.getElementById("brushSize")
+.addEventListener(
+"input",
+function(e){
+
+
+    brushSize =
+    e.target.value;
+
+
+    document
+    .getElementById("brushValue")
+    .textContent =
+    brushSize;
+
+});
+
+
+
+/* =========================
+
+TOOL SELECTOR
+
+========================= */
+
+
+function setTool(
+tool,
+status
+){
+
+
+    currentTool =
+    tool;
+
+
+    document
+    .querySelectorAll(
+        "#toolbar button"
+    )
+    .forEach(
+        button =>
+        button.classList.remove(
+            "active"
+        )
+    );
+
+
+    document
+    .getElementById("status")
+    .textContent =
+    status;
+
+
+    if(tool === "pen"){
+
+        document
+        .getElementById("penBtn")
+        .classList.add(
+            "active"
+        );
+
+    }
+
+
+    if(tool === "eraser"){
+
+        document
+        .getElementById("eraserBtn")
+        .classList.add(
+            "active"
+        );
+
+    }
+
+
+    if(tool === "rainbow"){
+
+        document
+        .getElementById("rainbowBtn")
+        .classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+
+PEN
+
+========================= */
+
+
+document
+.getElementById("penBtn")
+.addEventListener(
+"click",
+function(){
+
+    selectedShape = "";
+
+
+    setTool(
+        "pen",
+        "✏ Pen mode"
+    );
+
+});
+
+
+
+/* =========================
+
+ERASER
+
+========================= */
+
+
+document
+.getElementById("eraserBtn")
+.addEventListener(
+"click",
+function(){
+
+    selectedShape = "";
+
+
+    setTool(
+        "eraser",
+        "⌫ Eraser mode"
+    );
+
+});
+
+
+
+/* =========================
+
+RAINBOW
+
+========================= */
+
+
+document
+.getElementById("rainbowBtn")
+.addEventListener(
+"click",
+function(){
+
+    selectedShape = "";
+
+
+    setTool(
+        "rainbow",
+        "🌈 Rainbow mode"
+    );
+
+});
+
+
+
+/* =========================
+
+SHAPES
+
+========================= */
+
+
+document
+.getElementById("shapes")
+.addEventListener(
+"change",
+function(e){
+
+
+    selectedShape =
+    e.target.value;
+
+
+    if(!selectedShape)
+    return;
+
+
+    currentTool =
+    "shape";
+
+
+    document
+    .getElementById("status")
+    .textContent =
+    "Draw the shape by clicking and dragging";
+
+
+    e.target.value =
+    "";
+
+});
+
+
+
+/* =========================
+
+STICKERS
+
+========================= */
+
+
+document
+.getElementById("stickers")
+.addEventListener(
+"change",
+function(e){
+
+
+    selectedSticker =
+    e.target.value;
+
+
+    if(!selectedSticker)
+    return;
+
+
+    currentTool =
+    "sticker";
+
+
+    document
+    .getElementById("status")
+    .textContent =
+    "Click anywhere on the canvas to place your sticker";
+
+
+    e.target.value =
+    "";
+
+});
+
+
+
+/* =========================
+
+BACKGROUND COLOR
+
+========================= */
+
+
+document
+.getElementById("bgColor")
+.addEventListener(
+"input",
+function(e){
+
+
+    const current =
+    canvas.toDataURL();
+
+
+    ctx.save();
+
+
+    ctx.globalCompositeOperation =
+    "destination-over";
+
+
+    ctx.fillStyle =
+    e.target.value;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    ctx.restore();
+
+
+    saveState();
+
+});
+
+
+
+/* =========================
+
+CLEAR CANVAS
+
+========================= */
+
+
+document
+.getElementById("clearBtn")
+.addEventListener(
+"click",
+function(){
+
+
+    const confirmClear =
+    confirm(
+        "Are you sure you want to clear your doodle?"
+    );
+
+
+    if(!confirmClear)
+    return;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    fillBackground();
+
+
+    saveState();
+
+
+    document
+    .getElementById("status")
+    .textContent =
+    "Canvas cleared — start creating again!";
+
+});
+
+
+
+/* =========================
+
+SAVE IMAGE
+
+========================= */
+
+
+document
+.getElementById("saveBtn")
+.addEventListener(
+"click",
+function(){
+
+
+    const link =
+    document.createElement(
+        "a"
+    );
+
+
+    link.download =
+    "my-creative-doodle.png";
+
+
+    link.href =
+    canvas.toDataURL(
+        "image/png"
+    );
+
+
+    link.click();
+
+});
+
+
+
 </script>
 
 </body>
