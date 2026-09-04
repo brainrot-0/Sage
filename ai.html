@@ -435,11 +435,58 @@ return patterns.some(pattern=>pattern.test(normalized));
 }
 
 function detectMood(text){
-const t=text.toLowerCase();
-if(/\b(happy|good|great|excited|awesome|amazing|wonderful|joyful|glad|fantastic|love it|proud|thrilled|yay)\b/.test(t))return"happy";
-if(/\b(sad|down|depressed|cry|crying|lonely|hopeless|unhappy|heartbroken|miserable|empty|hurt|feeling low|bad day)\b/.test(t))return"sad";
-if(/\b(stressed|stress|tired|pressure|overwhelmed|overwhelming|anxious|anxiety|panic|panicking|worried|worry|nervous|too much|exhausted|burnt out|burnout|tension)\b/.test(t))return"stressed";
-if(/\b(angry|mad|furious|irritated|annoyed|frustrated|frustrating|rage|raging|fed up|hate this)\b/.test(t))return"angry";
+const t=text.toLowerCase().replace(/[’]/g,"'").trim();
+
+const negativePatterns=[
+/\bi\s*(do not|don't|dont|no longer)\s+(feel|feeling)\s+(good|great|happy|wonderful|amazing|fine|okay|ok)\b/,
+ /\bi\s*(am not|ain't|amn't)\s+(happy|good|great|fine|okay|ok)\b/,
+ /\bnot\s+(happy|good|great|fine|okay|ok)\b/,
+ /\bfeel(ing)?\s+(bad|low|down|sad|terrible|awful|horrible|empty|lonely|miserable|hopeless)\b/,
+ /\bi\s*(do not|don't|dont)\s+feel\s+(well|okay|fine)\b/,
+ /\bnot\s+feeling\s+(well|good|great|happy|okay|fine)\b/
+];
+
+if(negativePatterns.some(pattern=>pattern.test(t)))return"sad";
+
+const stressedPatterns=[
+/\b(stressed|stress|overwhelmed|overwhelming|anxious|anxiety|panic|panicking|worried|worry|nervous|too much|exhausted|burnt out|burnout|tension)\b/,
+ /\bunder\s+(a lot of\s+)?pressure\b/,
+ /\btoo\s+much\s+on\s+my\s+mind\b/,
+ /\bcan't\s+handle\s+(all\s+)?this\b/,
+ /\bcannot\s+handle\s+(all\s+)?this\b/
+];
+
+if(stressedPatterns.some(pattern=>pattern.test(t)))return"stressed";
+
+const angryPatterns=[
+/\b(angry|mad|furious|irritated|annoyed|frustrated|frustrating|rage|raging|fed up|hate this)\b/,
+ /\bthis\s+is\s+so\s+annoying\b/,
+ /\bthis\s+is\s+driving\s+me\s+crazy\b/
+];
+
+if(angryPatterns.some(pattern=>pattern.test(t)))return"angry";
+
+const sadPatterns=[
+/\b(sad|down|depressed|cry|crying|lonely|hopeless|unhappy|heartbroken|miserable|empty|hurt|feeling low|bad day)\b/,
+ /\bi\s+feel\s+(bad|low|down|sad|terrible|awful|horrible|empty|lonely)\b/,
+ /\bi\s+don't\s+feel\s+(well|good|great|okay|fine)\b/,
+ /\bi\s+dont\s+feel\s+(well|good|great|okay|fine)\b/,
+ /\bi\s+am\s+not\s+feeling\s+(good|well|great|okay|fine)\b/,
+ /\bi'm\s+not\s+feeling\s+(good|well|great|okay|fine)\b/
+];
+
+if(sadPatterns.some(pattern=>pattern.test(t)))return"sad";
+
+const happyPatterns=[
+/\b(happy|excited|awesome|amazing|wonderful|joyful|glad|fantastic|love it|proud|thrilled|yay)\b/,
+ /\bi\s+feel\s+(good|great|happy|wonderful|amazing|fantastic)\b/,
+ /\bi'm\s+(good|great|happy|fine|okay|excited)\b/,
+ /\bi\s+am\s+(good|great|happy|fine|okay|excited)\b/,
+ /\bfeeling\s+(good|great|happy|wonderful|amazing|fantastic)\b/
+];
+
+if(happyPatterns.some(pattern=>pattern.test(t)))return"happy";
+
 return"neutral";
 }
 
@@ -609,20 +656,68 @@ crisisMessage:"India support: For immediate emergencies, call 112. For 24/7 ment
 features:["breathing","journal"]
 };
 }
-
+const mood=detectMood(userText);
+if(mood!=="neutral"){
+conversationContext.lastMood=mood;
+conversationContext.moodHistory.push(mood);
+if(conversationContext.moodHistory.length>10){
+conversationContext.moodHistory.shift();
+}
+rememberTopic(userText,mood);
+conversationContext.lastIntent="mood";
+if(mood==="sad"){
+return{
+message:randomResponse(aiDatabase.sad),
+features:["journal","calmingSounds"]
+};
+}
+if(mood==="stressed"){
+return{
+message:randomResponse(aiDatabase.stressed),
+features:["breathing","calmingSounds"]
+};
+}
+if(mood==="happy"){
+return{
+message:randomResponse(aiDatabase.happy),
+features:["journal","doodle"]
+};
+}
+if(mood==="angry"){
+return{
+message:randomResponse(aiDatabase.angry),
+features:["breathing","doodle"]
+};
+}
+}
 const casual=detectCasualConversation(userText);
 if(casual){
 conversationContext.lastIntent=casual;
-if(casual==="greeting")return{message:randomResponse(casualResponses.greeting),features:[]};
-if(casual==="howAreYou")return{message:randomResponse(casualResponses.howAreYou),features:[]};
-if(casual==="thanks")return{message:randomResponse(casualResponses.thanks),features:[]};
-if(casual==="goodbye")return{message:randomResponse(casualResponses.goodbye),features:[]};
-if(casual==="day")return{message:randomResponse(casualResponses.day),features:[]};
-if(casual==="name")return{message:randomResponse(casualResponses.name),features:[]};
-if(casual==="compliment")return{message:randomResponse(casualResponses.compliment),features:[]};
-if(casual==="joke")return{message:randomResponse(casualResponses.joke),features:[]};
+if(casual==="greeting"){
+return{message:randomResponse(casualResponses.greeting),features:[]};
 }
-
+if(casual==="howAreYou"){
+return{message:randomResponse(casualResponses.howAreYou),features:[]};
+}
+if(casual==="thanks"){
+return{message:randomResponse(casualResponses.thanks),features:[]};
+}
+if(casual==="goodbye"){
+return{message:randomResponse(casualResponses.goodbye),features:[]};
+}
+if(casual==="day"){
+return{message:randomResponse(casualResponses.day),features:[]};
+}
+if(casual==="name"){
+return{message:randomResponse(casualResponses.name),features:[]};
+}
+if(casual==="compliment"){
+return{message:randomResponse(casualResponses.compliment),features:[]};
+}
+if(casual==="joke"){
+return{message:randomResponse(casualResponses.joke),features:[]};
+}
+}
 return getContextualResponse(userText);
 }
 
