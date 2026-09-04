@@ -166,12 +166,8 @@ Respond naturally.
         content: systemPrompt
       },
 
-      ...history,
-
-      {
-        role: "user",
-        content: message
-      }
+      ...history
+      
     ];
 
     const openRouterResponse = await fetch(
