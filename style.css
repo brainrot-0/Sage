@@ -244,3 +244,25 @@ footer { text-align: center; padding: 40px; font-size: 14px; color: #777; backgr
   nav { padding: 14px 30px; }
   .blog-grid { grid-template-columns: 1fr; }
 }
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 300px;
+}
+
+.faq-question {
+  cursor: pointer;
+}
+
+.faq-question i {
+  transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-question i {
+  transform: rotate(180deg);
+}
