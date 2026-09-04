@@ -2,793 +2,319 @@
 
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Relaxation Tools | MindEase</title>
 
-<link
-href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
-rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-<link
-rel="stylesheet"
+<link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
 
-
-/* =========================
-   ROOT
-========================= */
-
-
 :root {
-
-  --beige:#f5f1e8;
-
-  --text:#2b2b2b;
-
-  --accent:#b29b80;
-
-  --accent-dark:#9b886e;
-
-  --card:#ffffff;
-
-  --soft:#efe8dc;
-
+  --beige: #f5f1e8;
+  --text: #2b2b2b;
+  --accent: #b29b80;
 }
 
 
-
-/* =========================
-   GLOBAL
-========================= */
-
-
-* {
-
-  box-sizing:border-box;
-
-}
-
+/* ORIGINAL BODY */
 
 body {
-
   font-family:"Poppins",sans-serif;
-
   margin:0;
-
   background:var(--beige);
-
   color:var(--text);
-
 }
 
 
-
-/* =========================
-   NAVBAR
-========================= */
-
+/* NAVBAR */
 
 nav {
-
   display:flex;
-
   justify-content:space-between;
-
   align-items:center;
-
   padding:18px 60px;
-
-  background:
-  rgba(255,255,255,0.75);
-
-  backdrop-filter:
-  blur(10px);
-
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(8px);
   position:fixed;
-
   width:100%;
-
   top:0;
-
   left:0;
-
   z-index:100;
-
-  box-shadow:
-  0 2px 12px
-  rgba(0,0,0,0.03);
-
 }
-
 
 .logo {
-
   font-weight:600;
-
   font-size:22px;
-
-  color:var(--accent);
-
 }
-
 
 .nav-links {
-
   display:flex;
-
   gap:20px;
-
 }
-
 
 .nav-links a {
-
   text-decoration:none;
-
   color:var(--text);
-
   font-weight:500;
-
-  transition:0.2s;
-
 }
-
 
 .nav-links a:hover {
-
   color:var(--accent);
-
 }
 
 
-
-/* =========================
-   HERO
-========================= */
-
+/* HERO */
 
 .hero {
-
-  position:relative;
-
+  position: relative;
   height:50vh;
-
-  min-height:350px;
-
   display:flex;
-
   align-items:center;
-
   justify-content:center;
-
   text-align:center;
-
   margin-top:60px;
-
-  overflow:hidden;
-
 }
-
 
 .hero img {
-
   width:100%;
-
   height:100%;
-
   object-fit:cover;
-
-  filter:
-  brightness(65%);
-
+  filter: brightness(70%);
 }
-
 
 .overlay {
-
   position:absolute;
-
   inset:0;
-
-  background:
-  rgba(80,70,55,0.18);
-
+  background: rgba(245,241,232,0.35);
 }
-
 
 .hero-content {
-
   position:absolute;
-
   top:50%;
-
   left:50%;
-
-  transform:
-  translate(-50%,-50%);
-
+  transform:translate(-50%,-50%);
   color:#fff;
-
   z-index:1;
-
-  width:90%;
-
 }
-
 
 .hero-content h1 {
-
-  font-size:42px;
-
-  margin-bottom:10px;
-
-  text-shadow:
-  2px 2px 10px
-  rgba(0,0,0,0.5);
-
+  font-size:40px;
+  text-shadow:2px 2px 8px rgba(0,0,0,0.5);
 }
 
 
-.hero-content p {
-
-  font-size:17px;
-
-  text-shadow:
-  1px 1px 5px
-  rgba(0,0,0,0.5);
-
-}
-
-
-
-/* =========================
-   TOOLS SECTION
-========================= */
-
+/* TOOLS SECTION */
 
 .tools-section {
-
   padding:80px 20px;
-
   max-width:1100px;
-
   margin:0 auto;
-
 }
-
 
 .tools-section h2 {
-
   text-align:center;
-
   font-size:2.2rem;
-
-  color:var(--accent);
-
+  color: var(--accent);
   margin-bottom:40px;
-
 }
-
 
 .tools-grid {
-
   display:grid;
-
-  grid-template-columns:
-  repeat(
-    auto-fit,
-    minmax(280px,1fr)
-  );
-
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
   gap:30px;
-
 }
 
 
-
-/* =========================
-   TOOL CARD
-========================= */
-
+/* ORIGINAL TOOL CARDS */
 
 .tool-card {
-
-  background:var(--card);
-
+  background:#fff;
   padding:25px;
-
   border-radius:20px;
-
-  box-shadow:
-  0 10px 25px
-  rgba(0,0,0,0.05);
-
+  box-shadow:0 10px 25px rgba(0,0,0,0.05);
   text-align:center;
-
-  transition:
-  all 0.3s ease;
-
+  transition:all 0.3s ease;
 }
-
 
 .tool-card:hover {
-
-  transform:
-  translateY(-5px);
-
-  box-shadow:
-  0 15px 30px
-  rgba(0,0,0,0.08);
-
+  transform:translateY(-5px);
+  box-shadow:0 15px 30px rgba(0,0,0,0.07);
 }
-
 
 .tool-card .icon {
-
   font-size:40px;
-
   color:var(--accent);
-
   margin-bottom:15px;
-
 }
-
 
 .tool-card h3 {
-
-  font-size:1.35rem;
-
+  font-size:1.5rem;
   margin-bottom:10px;
-
 }
-
 
 .tool-card p {
-
-  font-size:0.95rem;
-
-  line-height:1.6;
-
-  margin-bottom:18px;
-
-  color:#666;
-
+  font-size:1rem;
+  line-height:1.5;
+  margin-bottom:15px;
 }
-
-
-
-/* =========================
-   BUTTONS
-========================= */
-
 
 .tool-card button {
-
-  padding:10px 16px;
-
+  padding:8px 14px;
   background:var(--accent);
-
   color:#fff;
-
   border:none;
-
-  border-radius:10px;
-
+  border-radius:6px;
   cursor:pointer;
-
-  font-family:"Poppins",sans-serif;
-
-  font-weight:500;
-
-  transition:0.25s;
-
+  font-weight:600;
 }
-
 
 .tool-card button:hover {
-
-  background:
-  var(--accent-dark);
-
-  transform:
-  translateY(-2px);
-
+  background:#9b886e;
 }
 
 
-.tool-card button:active {
-
-  transform:
-  scale(0.97);
-
-}
-
-
-
-/* =========================
-   TOOL RESULT AREA
-========================= */
-
-
-.tool-result {
-
-  display:none;
-
-  margin-top:18px;
-
-  padding:15px;
-
-  border-radius:14px;
-
-  background:#faf7f2;
-
-  animation:
-  fadeIn 0.4s ease;
-
-}
-
-
-.tool-result.active {
-
-  display:block;
-
-}
-
-
-@keyframes fadeIn {
-
-  from {
-
-    opacity:0;
-
-    transform:
-    translateY(10px);
-
-  }
-
-  to {
-
-    opacity:1;
-
-    transform:
-    translateY(0);
-
-  }
-
-}
-
-
-
-/* =========================
-   MOOD BOOSTER
-========================= */
-
-
-.mood-message {
-
-  font-size:14px;
-
-  line-height:1.6;
-
-  margin-bottom:10px;
-
-}
-
-
-.mood-quote {
-
-  font-style:italic;
-
-  color:#7f6d59;
-
-  font-size:13px;
-
-}
-
-
-
-/* =========================
-   BREATHING EXERCISE
-========================= */
-
+/* BREATHING CIRCLE */
 
 .breathing-circle {
-
-  width:130px;
-
-  height:130px;
-
+  width:150px;
+  height:150px;
+  border:5px solid var(--accent);
   border-radius:50%;
-
-  background:
-  rgba(178,155,128,0.2);
-
-  border:
-  4px solid
-  var(--accent);
-
   margin:20px auto;
-
-  display:flex;
+  display:none;
+  animation:none;
 
   align-items:center;
-
   justify-content:center;
 
   font-size:15px;
-
   font-weight:600;
-
   color:var(--accent);
-
 }
-
-
-.breathing-circle.breathing {
-
-  animation:
-  breathe
-  8s
-  ease-in-out
-  infinite;
-
-}
-
 
 @keyframes breathe {
-
-  0%,
-  100% {
-
-    transform:
-    scale(1);
-
+  0%, 100% {
+    transform:scale(1);
   }
 
-  40% {
-
-    transform:
-    scale(1.35);
-
+  50% {
+    transform:scale(1.4);
   }
-
-  60% {
-
-    transform:
-    scale(1.35);
-
-  }
-
 }
 
 
-.breathing-instruction {
+/* NEW FEATURES - MINIMAL VISUAL CHANGE */
 
-  font-size:14px;
+.tool-message {
+  display:none;
 
-  color:#666;
+  margin-top:15px;
 
-}
-
-
-.stop-button {
-
-  margin-top:10px;
-
-  background:#777 !important;
-
-}
-
-
-
-/* =========================
-   PANIC RELIEF
-========================= */
-
-
-.grounding-step {
-
-  display:flex;
-
-  align-items:center;
-
-  gap:10px;
-
-  margin:8px 0;
-
-  padding:9px;
-
-  background:white;
+  padding:12px;
 
   border-radius:10px;
+
+  background:#f8f5f0;
+
+  font-size:13px;
+
+  line-height:1.6;
+
+  color:#555;
+}
+
+
+.tool-message.active {
+  display:block;
+}
+
+
+/* PANIC STEPS */
+
+.panic-step {
+  padding:8px;
+  margin:6px 0;
+
+  background:#fff;
+
+  border-radius:8px;
 
   text-align:left;
 
   font-size:13px;
-
 }
 
 
-.grounding-number {
-
-  min-width:28px;
-
-  height:28px;
-
-  border-radius:50%;
-
-  background:var(--accent);
-
-  color:white;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  font-size:12px;
-
-  font-weight:600;
-
-}
-
-
-
-/* =========================
-   MINI GAME
-========================= */
-
+/* MINI GAME */
 
 .game-area {
-
-  margin-top:12px;
-
+  display:none;
+  margin-top:15px;
 }
 
+.game-area.active {
+  display:block;
+}
 
 .game-score {
-
   font-size:13px;
-
-  margin-bottom:10px;
-
   color:#777;
-
+  margin-bottom:8px;
 }
 
-
-.tap-button {
-
-  width:70px;
-
-  height:70px;
+.leaf-button {
+  width:60px !important;
+  height:60px;
 
   border-radius:50% !important;
 
   font-size:25px;
 
-  margin:10px;
-
-  animation:
-  float
-  2s
-  infinite
-  ease-in-out;
-
-}
-
-
-@keyframes float {
-
-  0%,
-  100% {
-
-    transform:
-    translateY(0);
-
-  }
-
-  50% {
-
-    transform:
-    translateY(-6px);
-
-  }
-
-}
-
-
-
-/* =========================
-   FOOTER
-========================= */
-
-
-footer {
-
-  text-align:center;
-
-  padding:40px 20px;
-
-  background:var(--soft);
-
-  color:#777;
-
-  margin-top:50px;
-
-}
-
-
-footer a {
-
-  margin:0 10px;
-
-  color:#777;
-
-  text-decoration:none;
+  padding:0 !important;
 
   transition:0.2s;
-
 }
 
+
+/* FOOTER */
+
+footer {
+  text-align:center;
+  padding:40px 20px;
+  background:#efe8dc;
+  color:#777;
+  margin-top:50px;
+}
+
+footer a {
+  margin:0 10px;
+  color:#777;
+  text-decoration:none;
+}
 
 footer a:hover {
-
   color:var(--accent);
-
 }
 
 
-
-/* =========================
-   RESPONSIVE
-========================= */
-
+/* RESPONSIVE */
 
 @media(max-width:768px){
 
-
   nav {
-
     padding:14px 20px;
-
   }
-
-
-  .nav-links {
-
-    gap:12px;
-
-    font-size:13px;
-
-  }
-
 
   .tools-grid {
-
-    grid-template-columns:
-    1fr;
-
+    grid-template-columns:1fr;
   }
-
-
-  .hero-content h1 {
-
-    font-size:32px;
-
-  }
-
 
 }
-
 
 </style>
 
@@ -796,9 +322,7 @@ footer a:hover {
 
 <body>
 
-<!-- =========================
-     NAVBAR
-========================= -->
+<!-- NAVBAR -->
 
 <nav>
 
@@ -819,20 +343,17 @@ MindEase
 
 </a>
 
-
 <a href="doodle.html">
 
   Doodle
 
 </a>
 
-
 <a href="journal.html">
 
   Journal
 
 </a>
-
 
 <a href="relaxation-tools.html">
 
@@ -845,15 +366,13 @@ MindEase
 
 </nav>
 
-<!-- =========================
-     HERO
-========================= -->
+<!-- HERO -->
 
 <section class="hero">
 
 <img
 src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80"
-alt="Peaceful nature relaxation">
+alt="Relaxation">
 
   <div class="overlay">
 
@@ -871,8 +390,7 @@ alt="Peaceful nature relaxation">
 
 <p>
 
-  Choose a gentle activity
-  based on how you feel right now.
+  Choose the right tool based on how you feel today.
 
 </p>
 ```
@@ -881,9 +399,7 @@ alt="Peaceful nature relaxation">
 
 </section>
 
-<!-- =========================
-     TOOLS SECTION
-========================= -->
+<!-- TOOLS SECTION -->
 
 <section class="tools-section">
 
@@ -898,64 +414,77 @@ Tools for Emotional Relief
   <div class="tools-grid">
 
 ```
-<!-- =====================
-     MOOD BOOSTER
-====================== -->
-
+<!-- DEPRESSION -->
 
 <div class="tool-card">
 
-
   <div class="icon">
-
     <i class="fas fa-smile-beam"></i>
-
   </div>
+
+  <h3>
+    Feeling Low / Depression
+  </h3>
+
+  <p>
+    Boost your mood with uplifting sounds and mini positivity exercises.
+  </p>
+
+<button
+ id="moodButton"
+ onclick="playMoodSound()">
+
+```
+Play Mood Booster
+```
+
+  </button>
+
+<button
+ id="moodStopButton"
+ onclick="stopMoodSound()"
+ style="display:none; margin-left:5px;">
+
+```
+Stop
+```
+
+  </button>
+
+  <div
+    class="tool-message"
+    id="moodMessage">
+  </div>
+
+</div>
 
 
   <h3>
 
-    Feeling Low
+    Feeling Low / Depression
 
   </h3>
 
 
   <p>
 
-    Take a small moment
-    for yourself with a
-    gentle positive reminder.
+    Boost your mood with uplifting sounds and mini positivity exercises.
 
   </p>
 
 
-  <button
-  onclick="playMoodSound()">
+  <!-- FIXED BUTTON -->
+
+  <button onclick="playMoodSound()">
 
     Play Mood Booster
 
   </button>
 
 
-
   <div
-  class="tool-result"
-  id="moodResult">
-
-
-    <div
-    class="mood-message"
-    id="moodMessage">
-
-    </div>
-
-
-    <div
-    class="mood-quote"
-    id="moodQuote">
-
-    </div>
-
+  class="tool-message"
+  id="moodMessage">
 
   </div>
 
@@ -964,10 +493,7 @@ Tools for Emotional Relief
 
 
 
-<!-- =====================
-     ANXIETY
-====================== -->
-
+<!-- ANXIETY -->
 
 <div class="tool-card">
 
@@ -988,53 +514,32 @@ Tools for Emotional Relief
 
   <p>
 
-    Slow down and follow
-    the circle with your breath.
+    Calm your mind with guided breathing and soft relaxing audio.
 
   </p>
 
 
   <button
-  id="breathingBtn"
+  id="breathingButton"
   onclick="startBreathing()">
 
-    Start Breathing
+    Start Breathing Exercise
 
   </button>
 
 
+  <div
+  class="breathing-circle"
+  id="circle">
+
+    Ready
+
+  </div>
+
 
   <div
-  class="tool-result"
-  id="breathingResult">
-
-
-    <div
-    class="breathing-circle"
-    id="circle">
-
-      Ready
-
-    </div>
-
-
-    <div
-    class="breathing-instruction"
-    id="breathingText">
-
-      Press start when ready.
-
-    </div>
-
-
-    <button
-    class="stop-button"
-    onclick="stopBreathing()">
-
-      Stop
-
-    </button>
-
+  class="tool-message"
+  id="breathingMessage">
 
   </div>
 
@@ -1043,10 +548,7 @@ Tools for Emotional Relief
 
 
 
-<!-- =====================
-     PANIC ATTACK
-====================== -->
-
+<!-- PANIC ATTACK -->
 
 <div class="tool-card">
 
@@ -1060,118 +562,66 @@ Tools for Emotional Relief
 
   <h3>
 
-    Feeling Panicked
+    Panic Attack
 
   </h3>
 
 
   <p>
 
-    Try a gentle grounding
-    exercise to reconnect
-    with the present moment.
+    Ground yourself quickly with 5-4-3-2-1 technique and calming sounds.
 
   </p>
 
 
-  <button
-  onclick="panicRelief()">
+  <button onclick="panicRelief()">
 
-    Start Grounding
+    Panic Relief
 
   </button>
 
 
-
   <div
-  class="tool-result"
-  id="panicResult">
+  class="tool-message"
+  id="panicMessage">
 
 
-    <p
-    style="
-    font-size:13px;
-    color:#666;
-    margin-bottom:12px;">
+    <div class="panic-step">
 
-      Go slowly. You do not
-      have to rush through
-      these steps.
-
-    </p>
-
-
-
-    <div class="grounding-step">
-
-      <div class="grounding-number">
-
-        5
-
-      </div>
-
-      Name five things
-      you can see.
+      <strong>5</strong>
+      things you can see
 
     </div>
 
 
+    <div class="panic-step">
 
-    <div class="grounding-step">
-
-      <div class="grounding-number">
-
-        4
-
-      </div>
-
-      Notice four things
-      you can feel.
+      <strong>4</strong>
+      things you can touch
 
     </div>
 
 
+    <div class="panic-step">
 
-    <div class="grounding-step">
-
-      <div class="grounding-number">
-
-        3
-
-      </div>
-
-      Listen for three
-      things you can hear.
+      <strong>3</strong>
+      things you can hear
 
     </div>
 
 
+    <div class="panic-step">
 
-    <div class="grounding-step">
-
-      <div class="grounding-number">
-
-        2
-
-      </div>
-
-      Notice two things
-      you can smell.
+      <strong>2</strong>
+      things you can smell
 
     </div>
 
 
+    <div class="panic-step">
 
-    <div class="grounding-step">
-
-      <div class="grounding-number">
-
-        1
-
-      </div>
-
-      Think of one thing
-      you can taste.
+      <strong>1</strong>
+      thing you can taste
 
     </div>
 
@@ -1183,10 +633,7 @@ Tools for Emotional Relief
 
 
 
-<!-- =====================
-     MINI GAME
-====================== -->
-
+<!-- EMOTIONAL DISTRESS -->
 
 <div class="tool-card">
 
@@ -1200,43 +647,28 @@ Tools for Emotional Relief
 
   <h3>
 
-    Emotional Reset
+    Emotional Distress
 
   </h3>
 
 
   <p>
 
-    Take a short mental
-    break with a simple
-    calming activity.
+    Play calming mini-games or soothing music to relieve emotional tension.
 
   </p>
 
 
-  <button
-  onclick="playMiniGame()">
+  <button onclick="playMiniGame()">
 
-    Start Mini Game
+    Play Mini Game
 
   </button>
 
 
-
   <div
-  class="tool-result"
-  id="gameResult">
-
-
-    <p
-    style="
-    font-size:13px;
-    color:#666;">
-
-      Tap the floating
-      leaf five times.
-
-    </p>
+  class="game-area"
+  id="gameArea">
 
 
     <div
@@ -1248,28 +680,19 @@ Tools for Emotional Relief
     </div>
 
 
-    <div
-    class="game-area">
+    <button
+    class="leaf-button"
+    id="leafButton"
+    onclick="tapLeaf()">
 
+      🍃
 
-      <button
-      class="tap-button"
-      id="tapButton"
-      onclick="tapLeaf()">
-
-        🍃
-
-      </button>
-
-
-    </div>
+    </button>
 
 
     <div
-    id="gameMessage"
-    style="
-    font-size:13px;
-    color:#7f6d59;">
+    class="tool-message"
+    id="gameMessage">
 
     </div>
 
@@ -1284,9 +707,7 @@ Tools for Emotional Relief
 
 </section>
 
-<!-- =========================
-     FOOTER
-========================= -->
+<!-- FOOTER -->
 
 <footer>
 
@@ -1304,30 +725,21 @@ Designed for Better Mindfulness.
 ```
 <a href="#">
 
-  <i
-  class="fab fa-facebook-f">
-
-  </i>
+  <i class="fab fa-facebook-f"></i>
 
 </a>
 
 
 <a href="#">
 
-  <i
-  class="fab fa-twitter">
-
-  </i>
+  <i class="fab fa-twitter"></i>
 
 </a>
 
 
 <a href="#">
 
-  <i
-  class="fab fa-instagram">
-
-  </i>
+  <i class="fab fa-instagram"></i>
 
 </a>
 ```
@@ -1339,137 +751,143 @@ Designed for Better Mindfulness.
 <script>
 
 
+
 /* =========================
-   MOOD BOOSTER
+MOOD BOOSTER
 ========================= */
 
+let moodAudio = null;
 
 function playMoodSound(){
 
+const messages = [
 
-  const result =
+```
+"You don't have to have everything figured out today. One small step is enough.",
 
-  document.getElementById(
-    "moodResult"
-  );
+"Be gentle with yourself. Difficult moments do not last forever.",
 
+"You have already survived many difficult days. Take this one moment at a time.",
 
-  const message =
+"Rest is also progress. Give yourself permission to slow down."
+```
 
-  document.getElementById(
-    "moodMessage"
-  );
+];
 
+const random =
+Math.floor(
+Math.random() * messages.length
+);
 
-  const quote =
+const messageBox =
+document.getElementById("moodMessage");
 
-  document.getElementById(
-    "moodQuote"
-  );
+const playButton =
+document.getElementById("moodButton");
 
+const stopButton =
+document.getElementById("moodStopButton");
 
+messageBox.textContent =
+messages[random];
 
-  const messages = [
+messageBox.classList.add("active");
 
+/* Stop previous audio if it exists */
 
-    "You do not need to solve everything today. Taking one small step is enough.",
+if(moodAudio){
 
+```
+moodAudio.pause();
 
-    "Even difficult days pass. Be gentle with yourself while you move through this one.",
-
-
-    "You have already made it through every difficult day before this moment.",
-
-
-    "Rest is not wasted time. Sometimes slowing down is exactly what you need."
-
-
-  ];
-
-
-
-  const quotes = [
-
-
-    "“Small progress is still progress.”",
-
-
-    "“You are allowed to take things one moment at a time.”",
-
-
-    "“Your current feelings are real, but they are not permanent.”",
-
-
-    "“Be proud of yourself for continuing.”"
-
-
-  ];
-
-
-
-  const random =
-
-  Math.floor(
-
-    Math.random()
-    *
-    messages.length
-
-  );
-
-
-
-  message.textContent =
-
-  messages[random];
-
-
-
-  quote.textContent =
-
-  quotes[random];
-
-
-
-  result.classList.add(
-    "active"
-  );
-
-
-
-  try{
-
-
-    const audio =
-
-    new Audio(
-      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-    );
-
-
-
-    audio.volume = 0.25;
-
-
-
-    audio.play();
-
-
-  }
-
-
-  catch(error){
-
-
-    console.log(
-      "Audio could not be played."
-    );
-
-
-  }
-
+moodAudio.currentTime = 0;
+```
 
 }
+
+/* Create audio */
+
+moodAudio = new Audio(
+"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+);
+
+moodAudio.volume = 0.25;
+
+moodAudio.loop = true;
+
+moodAudio.play()
+.then(() => {
+
+```
+playButton.textContent =
+  "Playing...";
+
+stopButton.style.display =
+  "inline-block";
+```
+
+})
+.catch(error => {
+
+```
+console.log(
+  "Audio could not be played:",
+  error
+);
+
+messageBox.textContent =
+  "Your browser blocked the audio. Try clicking the button again.";
+```
+
+});
+
+/* When audio naturally ends */
+
+moodAudio.onended = function(){
+
+```
+stopMoodSound();
+```
+
+};
+
+}
+
+/* =========================
+STOP MOOD SOUND
+========================= */
+
+function stopMoodSound(){
+
+const playButton =
+document.getElementById("moodButton");
+
+const stopButton =
+document.getElementById("moodStopButton");
+
+if(moodAudio){
+
+```
+moodAudio.pause();
+
+moodAudio.currentTime = 0;
+```
+
+}
+
+playButton.textContent =
+"Play Mood Booster";
+
+stopButton.style.display =
+"none";
+
+document.getElementById(
+"moodMessage"
+).textContent =
+"Audio stopped. Take a moment to breathe and relax.";
+
+}
+
 
 
 
@@ -1478,21 +896,14 @@ function playMoodSound(){
 ========================= */
 
 
-let breathingInterval = null;
+let breathingTimer = null;
 
 
-let breathingActive = false;
+let breathingRunning = false;
 
 
 
 function startBreathing(){
-
-
-  const result =
-
-  document.getElementById(
-    "breathingResult"
-  );
 
 
   const circle =
@@ -1502,47 +913,52 @@ function startBreathing(){
   );
 
 
-  const text =
+  const message =
 
   document.getElementById(
-    "breathingText"
+    "breathingMessage"
   );
 
 
   const button =
 
   document.getElementById(
-    "breathingBtn"
+    "breathingButton"
   );
 
 
 
-  result.classList.add(
-    "active"
-  );
+  /* STOP IF ALREADY RUNNING */
 
 
-  if(breathingActive)
-  return;
+  if(breathingRunning){
+
+
+    stopBreathing();
+
+
+    return;
+
+
+  }
 
 
 
-  breathingActive =
-  true;
+  breathingRunning = true;
 
 
 
   button.textContent =
-  "Breathing..." ;
-
-
-  circle.classList.add(
-    "breathing"
-  );
+  "Stop Exercise";
 
 
 
-  let phase = 0;
+  circle.style.display =
+  "flex";
+
+
+  circle.style.animation =
+  "breathe 8s infinite ease-in-out";
 
 
 
@@ -1550,19 +966,19 @@ function startBreathing(){
 
 
     {
-      text:"Breathe in...",
+      text:"Breathe in slowly...",
       duration:4000
     },
 
 
     {
-      text:"Hold...",
+      text:"Hold gently...",
       duration:2000
     },
 
 
     {
-      text:"Breathe out...",
+      text:"Breathe out slowly...",
       duration:4000
     }
 
@@ -1571,30 +987,39 @@ function startBreathing(){
 
 
 
-  function updateBreathing(){
+  let phase = 0;
 
 
-    text.textContent =
 
-    phases[
-      phase
-    ].text;
+  function nextPhase(){
+
+
+    if(!breathingRunning)
+    return;
+
+
+
+    message.textContent =
+
+    phases[phase].text;
+
+
+
+    message.classList.add(
+      "active"
+    );
 
 
 
     circle.textContent =
 
-    phases[
-      phase
-    ].text;
+    phases[phase].text;
 
 
 
     const duration =
 
-    phases[
-      phase
-    ].duration;
+    phases[phase].duration;
 
 
 
@@ -1606,10 +1031,10 @@ function startBreathing(){
 
 
 
-    breathingInterval =
+    breathingTimer =
 
     setTimeout(
-      updateBreathing,
+      nextPhase,
       duration
     );
 
@@ -1618,29 +1043,26 @@ function startBreathing(){
 
 
 
-  updateBreathing();
+  nextPhase();
 
 
 }
 
 
 
-/* =========================
-   STOP BREATHING
-========================= */
+/* STOP BREATHING */
 
 
 function stopBreathing(){
 
 
+  breathingRunning = false;
+
+
+
   clearTimeout(
-    breathingInterval
+    breathingTimer
   );
-
-
-
-  breathingActive =
-  false;
 
 
 
@@ -1651,36 +1073,43 @@ function stopBreathing(){
   );
 
 
-  const text =
-
-  document.getElementById(
-    "breathingText"
-  );
-
 
   const button =
 
   document.getElementById(
-    "breathingBtn"
+    "breathingButton"
   );
 
 
 
-  circle.classList.remove(
-    "breathing"
+  const message =
+
+  document.getElementById(
+    "breathingMessage"
   );
+
+
+
+  circle.style.animation =
+  "none";
 
 
   circle.textContent =
   "Ready";
 
 
-  text.textContent =
-  "Press start when you feel ready.";
-
 
   button.textContent =
-  "Start Breathing";
+  "Start Breathing Exercise";
+
+
+  message.textContent =
+  "Take your time. You can begin again whenever you are ready.";
+
+
+  message.classList.add(
+    "active"
+  );
 
 
 }
@@ -1695,28 +1124,17 @@ function stopBreathing(){
 function panicRelief(){
 
 
-  const result =
+  const message =
 
   document.getElementById(
-    "panicResult"
+    "panicMessage"
   );
 
 
-  result.classList.add(
+
+  message.classList.toggle(
     "active"
   );
-
-
-  result.scrollIntoView({
-
-
-    behavior:"smooth",
-
-
-    block:"nearest"
-
-
-  });
 
 
 }
@@ -1739,29 +1157,53 @@ function playMiniGame(){
 
 
 
-  document
-  .getElementById(
-    "gameScore"
-  )
-  .textContent =
+  const gameArea =
 
+  document.getElementById(
+    "gameArea"
+  );
+
+
+
+  const scoreDisplay =
+
+  document.getElementById(
+    "gameScore"
+  );
+
+
+
+  const leafButton =
+
+  document.getElementById(
+    "leafButton"
+  );
+
+
+
+  const gameMessage =
+
+  document.getElementById(
+    "gameMessage"
+  );
+
+
+
+  gameArea.classList.add(
+    "active"
+  );
+
+
+
+  scoreDisplay.textContent =
   "Score: 0 / 5";
 
 
-
-  document
-  .getElementById(
-    "gameMessage"
-  )
-  .textContent = "";
+  leafButton.style.display =
+  "inline-block";
 
 
-
-  document
-  .getElementById(
-    "gameResult"
-  )
-  .classList.add(
+  gameMessage.classList.remove(
     "active"
   );
 
@@ -1770,9 +1212,7 @@ function playMiniGame(){
 
 
 
-/* =========================
-   TAP LEAF
-========================= */
+/* TAP LEAF */
 
 
 function tapLeaf(){
@@ -1795,6 +1235,14 @@ function tapLeaf(){
 
 
 
+  const leafButton =
+
+  document.getElementById(
+    "leafButton"
+  );
+
+
+
   scoreDisplay.textContent =
 
   "Score: "
@@ -1805,25 +1253,59 @@ function tapLeaf(){
 
 
 
+  /* MOVE LEAF SLIGHTLY */
+
+
+  const randomX =
+
+  Math.floor(
+    Math.random()
+    *
+    80
+  )
+  -
+  40;
+
+
+
+  const randomY =
+
+  Math.floor(
+    Math.random()
+    *
+    20
+  )
+  -
+  10;
+
+
+
+  leafButton.style.transform =
+
+  `translate(${randomX}px, ${randomY}px)`;
+
+
+
   if(score === 5){
 
 
-    document
-    .getElementById(
+    const gameMessage =
+
+    document.getElementById(
       "gameMessage"
-    )
-    .textContent =
-
-    "Well done. Take one slow breath and notice how you feel now.";
+    );
 
 
 
-    document
-    .getElementById(
-      "tapButton"
-    )
-    .style.display =
-    "none";
+    gameMessage.textContent =
+
+    "Nice job. Take a slow breath and notice how your body feels now.";
+
+
+
+    gameMessage.classList.add(
+      "active"
+    );
 
 
   }
@@ -1832,52 +1314,7 @@ function tapLeaf(){
 }
 
 
-
-/* =========================
-   RESET LEAF GAME
-========================= */
-
-
-document
-.getElementById(
-  "tapButton"
-)
-.addEventListener(
-"click",
-function(){
-
-
-  if(score < 5){
-
-
-    const button =
-    this;
-
-
-
-    const x =
-
-    Math.random()
-    *
-    40
-    -
-    20;
-
-
-
-    button.style.transform =
-
-    `translateX(${x}px)`;
-
-
-  }
-
-
-});
-
-
 </script>
 
 </body>
-
 </html>
