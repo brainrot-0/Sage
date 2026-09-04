@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>MindEase - Voice Memories</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
-<script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#f4eee6,#e8ddd0);color:#4d443b}
@@ -28,7 +26,13 @@ nav{width:100%;padding:18px 50px;display:flex;justify-content:space-between;alig
 #fileInput{display:none}
 .memory-name{width:100%;padding:12px 14px;border:1px solid #d4c6b6;border-radius:9px;background:#fffaf5;font-family:inherit;color:#51483f;outline:none;margin-bottom:20px}
 .memory-name:focus{border-color:#a8937c}
-#waveform{width:100%;margin:20px 0;background:#f8f3ed;border-radius:10px;padding:10px;min-height:120px}
+#waveform{position:relative;width:100%;height:120px;margin:20px 0;background:#f8f3ed;border-radius:10px;overflow:hidden;cursor:crosshair}
+#waveCanvas{width:100%;height:100%;display:block}
+#selection{position:absolute;top:0;height:100%;background:rgba(155,136,110,.25);border-left:3px solid #8f7b65;border-right:3px solid #8f7b65;display:none;cursor:grab}
+#selection:active{cursor:grabbing}
+.selection-handle{position:absolute;top:0;width:12px;height:100%;cursor:ew-resize}
+.selection-handle.left{left:-7px}
+.selection-handle.right{right:-7px}
 .controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}
 .controls button{border:none;padding:10px 18px;border-radius:9px;background:#a8937c;color:white;font-family:inherit;cursor:pointer}
 .controls button:hover:not(:disabled){background:#8f7b65}
@@ -90,7 +94,13 @@ nav{padding:16px 20px}
 
 <input type="text" id="memoryName" class="memory-name" placeholder="Give this memory a name...">
 
-<div id="waveform"></div>
+<div id="waveform">
+<canvas id="waveCanvas"></canvas>
+<div id="selection">
+<div class="selection-handle left"></div>
+<div class="selection-handle right"></div>
+</div>
+</div>
 
 <div class="controls">
 <button type="button" id="playButton" disabled>Play Selection</button>
@@ -116,16 +126,23 @@ nav{padding:16px 20px}
 </footer>
 
 <script>
-let wavesurfer=null;
-let regionsPlugin=null;
-let selectedRegion=null;
-let currentFile=null;
-let currentFileURL=null;
 let db=null;
+let audioBuffer=null;
+let audioContext=null;
+let sourceNode=null;
+let currentFile=null;
+let duration=0;
+let selectionStart=0;
+let selectionEnd=0;
+let dragging=null;
 let savedAudioURLs=[];
 
 const fileInput=document.getElementById("fileInput");
 const memoryName=document.getElementById("memoryName");
+const canvas=document.getElementById("waveCanvas");
+const canvasContext=canvas.getContext("2d");
+const waveform=document.getElementById("waveform");
+const selection=document.getElementById("selection");
 const playButton=document.getElementById("playButton");
 const resetButton=document.getElementById("resetButton");
 const saveButton=document.getElementById("saveButton");
@@ -158,6 +175,304 @@ resetButton.disabled=!enabled;
 saveButton.disabled=!enabled;
 }
 
+function drawWaveform(){
+if(!audioBuffer)return;
+
+const width=canvas.clientWidth;
+const height=canvas.clientHeight;
+const pixelRatio=window.devicePixelRatio||1;
+
+canvas.width=width*pixelRatio;
+canvas.height=height*pixelRatio;
+canvasContext.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+
+canvasContext.clearRect(0,0,width,height);
+
+const data=audioBuffer.getChannelData(0);
+const step=Math.max(1,Math.floor(data.length/width));
+const middle=height/2;
+
+canvasContext.beginPath();
+
+for(let x=0;x<width;x++){
+const start=x*step;
+const end=Math.min(start+step,data.length);
+
+let min=1;
+let max=-1;
+
+for(let i=start;i<end;i++){
+const value=data[i];
+if(value<min)min=value;
+if(value>max)max=value;
+}
+
+canvasContext.moveTo(x,middle+min*middle*.85);
+canvasContext.lineTo(x,middle+max*middle*.85);
+}
+
+canvasContext.strokeStyle="#a8937c";
+canvasContext.lineWidth=1;
+canvasContext.stroke();
+}
+
+function updateSelection(){
+if(!duration)return;
+
+selection.style.display="block";
+selection.style.left=(selectionStart/duration*100)+"%";
+selection.style.width=((selectionEnd-selectionStart)/duration*100)+"%";
+
+selectionInfo.textContent=
+"Selected: "+
+formatTime(selectionStart)+
+" – "+
+formatTime(selectionEnd)+
+" ("+
+formatTime(selectionEnd-selectionStart)+
+")";
+}
+
+function setSelection(start,end){
+selectionStart=Math.max(0,Math.min(start,duration));
+selectionEnd=Math.max(0,Math.min(end,duration));
+
+if(selectionStart>selectionEnd){
+const temp=selectionStart;
+selectionStart=selectionEnd;
+selectionEnd=temp;
+}
+
+if(selectionEnd-selectionStart<.05){
+selectionEnd=Math.min(duration,selectionStart+.05);
+}
+
+updateSelection();
+}
+
+function stopAudio(){
+if(sourceNode){
+try{
+sourceNode.stop();
+}catch(error){}
+sourceNode.disconnect();
+sourceNode=null;
+}
+playButton.textContent="Play Selection";
+}
+
+async function playSelection(){
+if(!audioBuffer){
+showStatus("Please upload an audio recording first.");
+return;
+}
+
+if(sourceNode){
+stopAudio();
+return;
+}
+
+try{
+if(!audioContext){
+audioContext=new(window.AudioContext||window.webkitAudioContext)();
+}
+
+if(audioContext.state==="suspended"){
+await audioContext.resume();
+}
+
+sourceNode=audioContext.createBufferSource();
+sourceNode.buffer=audioBuffer;
+
+const gainNode=audioContext.createGain();
+sourceNode.connect(gainNode);
+gainNode.connect(audioContext.destination);
+
+sourceNode.onended=function(){
+if(sourceNode){
+sourceNode.disconnect();
+sourceNode=null;
+}
+playButton.textContent="Play Selection";
+};
+
+sourceNode.start(0,selectionStart,selectionEnd-selectionStart);
+playButton.textContent="Pause";
+showStatus("Playing the selected part of your recording.");
+}catch(error){
+console.error(error);
+showStatus("Unable to play this recording.");
+playButton.textContent="Play Selection";
+}
+}
+
+fileInput.addEventListener("change",async function(event){
+const file=event.target.files[0];
+
+if(!file)return;
+
+if(!file.type.startsWith("audio/")){
+showStatus("Please choose a valid audio recording.");
+fileInput.value="";
+return;
+}
+
+try{
+stopAudio();
+
+currentFile=file;
+memoryName.value=file.name.replace(/\.[^/.]+$/,"");
+
+showStatus("Loading audio...");
+selectionInfo.textContent="Preparing waveform...";
+setControls(false);
+
+const arrayBuffer=await file.arrayBuffer();
+
+if(!audioContext){
+audioContext=new(window.AudioContext||window.webkitAudioContext)();
+}
+
+audioBuffer=await audioContext.decodeAudioData(arrayBuffer);
+
+duration=audioBuffer.duration;
+selectionStart=0;
+selectionEnd=duration;
+
+drawWaveform();
+updateSelection();
+
+setControls(true);
+
+showStatus("Audio loaded. Drag the selection to choose the part you want to save.");
+}catch(error){
+console.error("Audio loading error:",error);
+audioBuffer=null;
+duration=0;
+selection.style.display="none";
+setControls(false);
+selectionInfo.textContent="Upload an audio file to begin.";
+showStatus("This audio file could not be loaded. Please try another recording.");
+}
+});
+
+resetButton.addEventListener("click",function(){
+if(!audioBuffer)return;
+
+stopAudio();
+setSelection(0,duration);
+showStatus("Selection reset to the complete recording.");
+});
+
+playButton.addEventListener("click",playSelection);
+
+saveButton.addEventListener("click",async function(){
+if(!audioBuffer||!currentFile){
+showStatus("Please upload an audio recording first.");
+return;
+}
+
+if(selectionEnd-selectionStart<.05){
+showStatus("Please select a valid portion of the recording.");
+return;
+}
+
+const name=memoryName.value.trim()||"Voice Memory";
+
+saveButton.disabled=true;
+playButton.disabled=true;
+resetButton.disabled=true;
+saveButton.textContent="Saving...";
+showStatus("Creating your trimmed memory...");
+
+try{
+stopAudio();
+
+const trimmedBlob=createTrimmedWav(
+audioBuffer,
+selectionStart,
+selectionEnd
+);
+
+await addMemory({
+name:name,
+audio:trimmedBlob,
+duration:selectionEnd-selectionStart,
+createdAt:Date.now()
+});
+
+await displayMemories();
+
+showStatus("Memory saved successfully.");
+}catch(error){
+console.error("Save error:",error);
+showStatus("Could not save the memory. Please try again.");
+}finally{
+saveButton.disabled=false;
+playButton.disabled=false;
+resetButton.disabled=false;
+saveButton.textContent="Save Memory";
+}
+});
+
+function createTrimmedWav(buffer,startTime,endTime){
+const sampleRate=buffer.sampleRate;
+const startSample=Math.floor(startTime*sampleRate);
+const endSample=Math.min(
+buffer.length,
+Math.floor(endTime*sampleRate)
+);
+
+const frameCount=endSample-startSample;
+const channels=buffer.numberOfChannels;
+const bytesPerSample=2;
+const blockAlign=channels*bytesPerSample;
+const dataSize=frameCount*blockAlign;
+
+const arrayBuffer=new ArrayBuffer(44+dataSize);
+const view=new DataView(arrayBuffer);
+
+writeString(view,0,"RIFF");
+view.setUint32(4,36+dataSize,true);
+writeString(view,8,"WAVE");
+writeString(view,12,"fmt ");
+view.setUint32(16,16,true);
+view.setUint16(20,1,true);
+view.setUint16(22,channels,true);
+view.setUint32(24,sampleRate,true);
+view.setUint32(28,sampleRate*blockAlign,true);
+view.setUint16(32,blockAlign,true);
+view.setUint16(34,16,true);
+writeString(view,36,"data");
+view.setUint32(40,dataSize,true);
+
+let offset=44;
+
+for(let i=startSample;i<endSample;i++){
+for(let channel=0;channel<channels;channel++){
+let sample=buffer.getChannelData(channel)[i];
+
+sample=Math.max(-1,Math.min(1,sample));
+
+const value=
+sample<0
+?sample*32768
+:sample*32767;
+
+view.setInt16(offset,value,true);
+offset+=2;
+}
+}
+
+return new Blob([arrayBuffer],{type:"audio/wav"});
+}
+
+function writeString(view,offset,string){
+for(let i=0;i<string.length;i++){
+view.setUint8(offset+i,string.charCodeAt(i));
+}
+}
+
 function openDatabase(){
 return new Promise((resolve,reject)=>{
 const request=indexedDB.open("MindEaseVoiceMemories",1);
@@ -170,7 +485,10 @@ const store=database.createObjectStore("memories",{
 keyPath:"id",
 autoIncrement:true
 });
-store.createIndex("createdAt","createdAt",{unique:false});
+
+store.createIndex("createdAt","createdAt",{
+unique:false
+});
 }
 };
 
@@ -211,22 +529,6 @@ request.onsuccess=function(){
 const memories=request.result||[];
 memories.sort((a,b)=>b.createdAt-a.createdAt);
 resolve(memories);
-};
-
-request.onerror=function(){
-reject(request.error);
-};
-});
-}
-
-function getMemory(id){
-return new Promise((resolve,reject)=>{
-const transaction=db.transaction("memories","readonly");
-const store=transaction.objectStore("memories");
-const request=store.get(id);
-
-request.onsuccess=function(){
-resolve(request.result);
 };
 
 request.onerror=function(){
@@ -284,334 +586,6 @@ reject(request.error);
 });
 }
 
-function initializeWaveSurfer(){
-regionsPlugin=WaveSurfer.Regions.create();
-
-wavesurfer=WaveSurfer.create({
-container:"#waveform",
-waveColor:"#b29b80",
-progressColor:"#9b886e",
-cursorColor:"#555",
-height:100,
-normalize:true,
-dragToSeek:true,
-plugins:[regionsPlugin]
-});
-
-wavesurfer.on("ready",function(){
-createSelection();
-setControls(true);
-updateSelectionInfo();
-showStatus("Audio loaded. Drag the edges of the selection to choose the part you want to save.");
-});
-
-wavesurfer.on("error",function(error){
-console.error("WaveSurfer error:",error);
-setControls(false);
-showStatus("The audio could not be loaded. Please try another recording.");
-});
-
-wavesurfer.on("play",function(){
-playButton.textContent="Pause";
-});
-
-wavesurfer.on("pause",function(){
-playButton.textContent="Play Selection";
-});
-
-wavesurfer.on("finish",function(){
-playButton.textContent="Play Selection";
-});
-
-regionsPlugin.on("region-created",function(region){
-selectedRegion=region;
-updateSelectionInfo();
-});
-
-regionsPlugin.on("region-updated",function(region){
-selectedRegion=region;
-updateSelectionInfo();
-});
-
-regionsPlugin.on("region-clicked",function(region,event){
-event.stopPropagation();
-selectedRegion=region;
-updateSelectionInfo();
-});
-}
-
-function createSelection(){
-if(!wavesurfer||!regionsPlugin)return;
-
-regionsPlugin.clear();
-
-const duration=wavesurfer.getDuration();
-
-if(!Number.isFinite(duration)||duration<=0){
-selectedRegion=null;
-return;
-}
-
-selectedRegion=regionsPlugin.addRegion({
-start:0,
-end:duration,
-color:"rgba(155,136,110,0.22)",
-drag:true,
-resize:true
-});
-
-updateSelectionInfo();
-}
-
-function updateSelectionInfo(){
-if(!selectedRegion){
-selectionInfo.textContent="Upload an audio file to begin.";
-return;
-}
-
-const start=selectedRegion.start;
-const end=selectedRegion.end;
-const duration=end-start;
-
-selectionInfo.textContent=
-"Selected: "+
-formatTime(start)+
-" – "+
-formatTime(end)+
-" ("+
-formatTime(duration)+
-")";
-}
-
-fileInput.addEventListener("change",function(event){
-const file=event.target.files[0];
-
-if(!file)return;
-
-if(!file.type.startsWith("audio/")){
-showStatus("Please choose a valid audio recording.");
-fileInput.value="";
-return;
-}
-
-currentFile=file;
-
-if(currentFileURL){
-URL.revokeObjectURL(currentFileURL);
-}
-
-currentFileURL=URL.createObjectURL(file);
-
-memoryName.value=file.name.replace(/\.[^/.]+$/,"");
-
-if(wavesurfer){
-wavesurfer.stop();
-}
-
-if(regionsPlugin){
-regionsPlugin.clear();
-}
-
-selectedRegion=null;
-setControls(false);
-selectionInfo.textContent="Loading audio...";
-showStatus("Loading audio...");
-
-wavesurfer.loadBlob(file);
-});
-
-playButton.addEventListener("click",function(){
-if(!wavesurfer||!selectedRegion){
-showStatus("Please upload an audio recording first.");
-return;
-}
-
-if(wavesurfer.isPlaying()){
-wavesurfer.pause();
-return;
-}
-
-wavesurfer.play(
-selectedRegion.start,
-selectedRegion.end
-);
-});
-
-resetButton.addEventListener("click",function(){
-if(!wavesurfer||!currentFile){
-showStatus("Please upload an audio recording first.");
-return;
-}
-
-wavesurfer.stop();
-createSelection();
-playButton.textContent="Play Selection";
-showStatus("Selection reset to the complete recording.");
-});
-
-saveButton.addEventListener("click",async function(){
-if(!currentFile||!selectedRegion){
-showStatus("Please upload an audio recording and select a section.");
-return;
-}
-
-const start=selectedRegion.start;
-const end=selectedRegion.end;
-const duration=end-start;
-
-if(duration<0.1){
-showStatus("Please select a longer section of the recording.");
-return;
-}
-
-const name=memoryName.value.trim()||"Voice Memory";
-
-saveButton.disabled=true;
-playButton.disabled=true;
-resetButton.disabled=true;
-saveButton.textContent="Saving...";
-showStatus("Creating your trimmed memory...");
-
-try{
-const trimmedBlob=await createTrimmedAudio(
-currentFile,
-start,
-end
-);
-
-await addMemory({
-name:name,
-audio:trimmedBlob,
-duration:duration,
-createdAt:Date.now()
-});
-
-await displayMemories();
-
-showStatus("Memory saved successfully.");
-}catch(error){
-console.error("Could not save memory:",error);
-showStatus("Could not save the memory. Please try another recording.");
-}finally{
-saveButton.disabled=false;
-playButton.disabled=false;
-resetButton.disabled=false;
-saveButton.textContent="Save Memory";
-}
-});
-
-async function createTrimmedAudio(file,startTime,endTime){
-const arrayBuffer=await file.arrayBuffer();
-
-const AudioContextClass=
-window.AudioContext||window.webkitAudioContext;
-
-if(!AudioContextClass){
-throw new Error("Web Audio API is not supported.");
-}
-
-const audioContext=new AudioContextClass();
-
-try{
-const audioBuffer=
-await audioContext.decodeAudioData(arrayBuffer);
-
-const sampleRate=audioBuffer.sampleRate;
-
-const startSample=Math.max(
-0,
-Math.floor(startTime*sampleRate)
-);
-
-const endSample=Math.min(
-audioBuffer.length,
-Math.floor(endTime*sampleRate)
-);
-
-const frameCount=endSample-startSample;
-
-if(frameCount<=0){
-throw new Error("Invalid audio selection.");
-}
-
-const trimmedBuffer=
-audioContext.createBuffer(
-audioBuffer.numberOfChannels,
-frameCount,
-sampleRate
-);
-
-for(let channel=0;channel<audioBuffer.numberOfChannels;channel++){
-const sourceData=audioBuffer.getChannelData(channel);
-const targetData=trimmedBuffer.getChannelData(channel);
-
-targetData.set(
-sourceData.slice(startSample,endSample)
-);
-}
-
-return audioBufferToWav(trimmedBuffer);
-}finally{
-await audioContext.close();
-}
-}
-
-function audioBufferToWav(buffer){
-const numberOfChannels=buffer.numberOfChannels;
-const sampleRate=buffer.sampleRate;
-const bytesPerSample=2;
-const blockAlign=numberOfChannels*bytesPerSample;
-const dataSize=buffer.length*blockAlign;
-
-const arrayBuffer=new ArrayBuffer(44+dataSize);
-const view=new DataView(arrayBuffer);
-
-writeString(view,0,"RIFF");
-view.setUint32(4,36+dataSize,true);
-writeString(view,8,"WAVE");
-writeString(view,12,"fmt ");
-view.setUint32(16,16,true);
-view.setUint16(20,1,true);
-view.setUint16(22,numberOfChannels,true);
-view.setUint32(24,sampleRate,true);
-view.setUint32(28,sampleRate*blockAlign,true);
-view.setUint16(32,blockAlign,true);
-view.setUint16(34,16,true);
-writeString(view,36,"data");
-view.setUint32(40,dataSize,true);
-
-let offset=44;
-
-for(let i=0;i<buffer.length;i++){
-for(let channel=0;channel<numberOfChannels;channel++){
-let sample=buffer.getChannelData(channel)[i];
-
-sample=Math.max(-1,Math.min(1,sample));
-
-const value=
-sample<0
-?sample*0x8000
-:sample*0x7fff;
-
-view.setInt16(offset,value,true);
-offset+=2;
-}
-}
-
-return new Blob([arrayBuffer],{
-type:"audio/wav"
-});
-}
-
-function writeString(view,offset,string){
-for(let i=0;i<string.length;i++){
-view.setUint8(
-offset+i,
-string.charCodeAt(i)
-);
-}
-}
-
 async function displayMemories(){
 const memories=await getMemories();
 
@@ -620,7 +594,7 @@ savedAudioURLs=[];
 
 memoryList.innerHTML="";
 
-if(memories.length===0){
+if(!memories.length){
 memoryList.innerHTML=`
 <div class="empty-state">
 No saved memories yet.<br>
@@ -690,11 +664,9 @@ deleteButton.textContent="Delete";
 deleteButton.className="delete-btn";
 
 deleteButton.addEventListener("click",async function(){
-const confirmed=confirm(
-"Are you sure you want to delete this memory?"
-);
-
-if(!confirmed)return;
+if(!confirm("Are you sure you want to delete this memory?")){
+return;
+}
 
 try{
 await deleteMemory(memory.id);
@@ -716,9 +688,9 @@ const audio=document.createElement("audio");
 audio.controls=true;
 audio.preload="metadata";
 
-const audioURL=URL.createObjectURL(memory.audio);
-savedAudioURLs.push(audioURL);
-audio.src=audioURL;
+const url=URL.createObjectURL(memory.audio);
+savedAudioURLs.push(url);
+audio.src=url;
 
 item.appendChild(top);
 item.appendChild(audio);
@@ -727,30 +699,86 @@ memoryList.appendChild(item);
 });
 }
 
+waveform.addEventListener("mousedown",function(event){
+if(!audioBuffer)return;
+
+const rect=waveform.getBoundingClientRect();
+const x=event.clientX-rect.left;
+const time=Math.max(0,Math.min(duration,(x/rect.width)*duration));
+
+const leftPixel=(selectionStart/duration)*rect.width;
+const rightPixel=(selectionEnd/duration)*rect.width;
+const mousePixel=x;
+
+if(Math.abs(mousePixel-leftPixel)<15){
+dragging="left";
+}else if(Math.abs(mousePixel-rightPixel)<15){
+dragging="right";
+}else if(mousePixel>leftPixel&&mousePixel<rightPixel){
+dragging="move";
+}else{
+selectionStart=time;
+selectionEnd=Math.min(duration,time+Math.min(5,duration-time));
+if(selectionEnd<=selectionStart){
+selectionStart=Math.max(0,time-5);
+selectionEnd=time;
+}
+updateSelection();
+dragging="move";
+}
+
+event.preventDefault();
+});
+
+window.addEventListener("mousemove",function(event){
+if(!dragging||!audioBuffer)return;
+
+const rect=waveform.getBoundingClientRect();
+const x=Math.max(0,Math.min(rect.width,event.clientX-rect.left));
+const time=(x/rect.width)*duration;
+
+if(dragging==="left"){
+selectionStart=Math.min(time,selectionEnd-.05);
+selectionStart=Math.max(0,selectionStart);
+}else if(dragging==="right"){
+selectionEnd=Math.max(time,selectionStart+.05);
+selectionEnd=Math.min(duration,selectionEnd);
+}else if(dragging==="move"){
+const originalLength=selectionEnd-selectionStart;
+let newStart=time-originalLength/2;
+
+newStart=Math.max(
+0,
+Math.min(duration-originalLength,newStart)
+);
+
+selectionStart=newStart;
+selectionEnd=newStart+originalLength;
+}
+
+updateSelection();
+});
+
+window.addEventListener("mouseup",function(){
+dragging=null;
+});
+
+window.addEventListener("resize",function(){
+if(audioBuffer){
+drawWaveform();
+updateSelection();
+}
+});
+
 async function initialize(){
 try{
 await openDatabase();
-initializeWaveSurfer();
 await displayMemories();
 }catch(error){
-console.error("MindEase Voice Memories initialization error:",error);
+console.error("Initialization error:",error);
 showStatus("Voice Memories could not be initialized.");
 }
 }
-
-window.addEventListener("beforeunload",function(){
-if(currentFileURL){
-URL.revokeObjectURL(currentFileURL);
-}
-
-savedAudioURLs.forEach(url=>{
-URL.revokeObjectURL(url);
-});
-
-if(wavesurfer){
-wavesurfer.destroy();
-}
-});
 
 initialize();
 </script>
