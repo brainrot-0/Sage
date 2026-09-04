@@ -183,7 +183,7 @@ Respond naturally.
         },
 
         body: JSON.stringify({
-          model: "thinkingmachines/inkling:free",
+          model: "openrouter:free",
 
           messages,
 
