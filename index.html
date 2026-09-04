@@ -458,6 +458,19 @@ footer { text-align:center; padding:40px; font-size:14px; color:#777; background
   </div>
 </section>
 
+<!-- FAQ Dropdown JavaScript -->
+<script>
+  const faqQuestions = document.querySelectorAll(".faq-question");
+
+  faqQuestions.forEach((question) => {
+    question.addEventListener("click", () => {
+      const faqItem = question.parentElement;
+
+      faqItem.classList.toggle("active");
+    });
+  });
+</script>
+  
 <footer> <h3>MindEase</h3>
   <p>Your gentle companion in the journey of mindfulness, calm, and relaxation.</p>
   <div>
@@ -465,7 +478,7 @@ footer { text-align:center; padding:40px; font-size:14px; color:#777; background
     <a href="#"><i class="fab fa-twitter"></i></a>
     <a href="#"><i class="fab fa-instagram"></i></a>
   </div>
-  <p>&copy; 2026 MindEase. All rights reserved.</p>
+  <p>&copy; 2026 MindEase. Designed for Better Mindfulness.</p>
 </footer>
 
 
