@@ -19,17 +19,18 @@ body {
 
 /* Navbar */
 nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 60px;
-  position: fixed;
-  width: 100%;
-  top: 0;
-  left: 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 60px;
   background: rgba(255,255,255,0.4);
   backdrop-filter: blur(8px);
-  z-index: 100;
+  position:fixed;
+  width:100%;
+  top:0;
+  left:0;
+  z-index:100;
+  box-sizing:border-box;
 }
 
 .logo { font-weight: 600; font-size: 22px; }
