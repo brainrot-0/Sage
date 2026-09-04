@@ -1,162 +1,120 @@
 export default async function handler(req, res) {
-    if (req.method !== "POST") {
-        return res.status(405).json({
-            error: "Method not allowed"
-        });
+  // Allow only POST requests
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
+  }
+
+  try {
+    const { messages } = req.body;
+
+    if (!messages) {
+      return res.status(400).json({
+        error: "Messages are required"
+      });
     }
 
-    try {
-        const { message, history = [], context = {} } = req.body || {};
+    const systemPrompt = `
+You are MindEase, a calm and emotionally intelligent
+conversational companion.
 
-        if (!message || typeof message !== "string") {
-            return res.status(400).json({
-                error: "Message is required"
-            });
-        }
+Your primary purpose is to provide comforting,
+sensible, and thoughtful conversations.
 
-        const systemPrompt = `
-You are MindEase Assistant, the conversational AI inside the MindEase mental-wellness application.
+PERSONALITY:
+- Calm
+- Poised
+- Patient
+- Emotionally mature
+- Warm but not overly enthusiastic
+- Sensible and realistic
+- Non-judgmental
 
-Your job is to have natural, warm, human-like conversations with the user.
+CONVERSATION STYLE:
+- Carefully understand the user before responding.
+- Do not rush to give advice.
+- When someone is upset, acknowledge their feelings naturally.
+- Keep responses calm and grounded.
+- Avoid motivational clichés.
+- Avoid excessive enthusiasm.
+- Do not sound robotic or overly clinical.
+- Do not use excessive emojis.
 
-IMPORTANT BEHAVIOR:
-- Respond naturally to what the user actually said.
-- Use the previous conversation to understand context.
-- Do not behave like a keyword-response chatbot.
-- Do not randomly change the subject.
-- Do not repeat the same phrases.
-- Do not repeatedly say "I'm here to listen."
-- Do not use generic responses when the user has given you something specific.
-- Ask a relevant follow-up question when appropriate.
-- Remember information mentioned earlier in the conversation.
-- If the user explains why they feel something, respond to the reason rather than just naming the emotion.
-- Keep ordinary responses reasonably concise.
-- Do not diagnose mental illnesses.
-- Do not claim to be a therapist, doctor, or human.
-- Do not make the conversation unnecessarily clinical.
+WHEN THE USER IS DISTRESSED:
+- Listen carefully.
+- Acknowledge their feelings.
+- Help them think clearly.
+- Offer practical suggestions when appropriate.
+- Do not overwhelm them.
 
-EMOTIONAL UNDERSTANDING:
-Recognize different emotional states such as:
-sadness, depression, loneliness, anxiety, stress, overwhelm, anger,
-frustration, guilt, worthlessness, hopelessness, confusion, tiredness,
-happiness, excitement and neutral conversation.
+WHEN THE USER ASKS FOR ADVICE:
+- Give balanced and sensible suggestions.
+- Explain different perspectives when useful.
+- Do not pretend to know everything.
 
-Do not simply announce the detected emotion.
-Use it to shape your response.
+IMPORTANT SAFETY RULES:
+- You are a conversational companion, not a therapist.
+- Do not diagnose mental health conditions.
+- Do not encourage emotional dependency.
+- Do not encourage harmful actions.
 
-For example:
+Your goal is to help the user feel heard,
+understood, calmer, and able to think clearly.
 
-User:
-"I feel like a burden."
-
-Bad:
-"You seem sad. I'm here to listen."
-
-Better:
-"Feeling like a burden can hurt in a way that's difficult to explain. What happened today that made you feel that way?"
-
-CONTEXT:
-The frontend may provide conversation context containing:
-- recent emotions
-- previous topics
-- previous user messages
-- conversation stage
-- safety context
-
-Use that context when generating your response.
-
-SAFETY:
-If the user expresses suicidal thoughts, intent to die, self-harm,
-or says things suggesting they may not be safe, take the statement seriously.
-
-Do not ignore the statement or respond casually.
-
-Encourage the person to move near someone they trust and seek immediate
-real-world help.
-
-For users in India:
-- Emergency: 112
-- Tele-MANAS: 14416
-- Tele-MANAS: 1-800-891-4416
-
-If there is immediate danger, encourage contacting emergency services
-or going to the nearest emergency department.
-
-Do not overwhelm the user with a huge block of information.
-
-If a previous message indicates suicidal thoughts, interpret ambiguous
-later messages in that context.
-
-FEATURES:
-MindEase contains tools such as:
-- Journal
-- Breathing exercises
-- Calming sounds
-- Doodle space
-- Motivational stories
-- Voice memories
-
-Only recommend one of these when it genuinely fits the conversation.
-Do not advertise features after every emotional message.
-
-CURRENT CONTEXT:
-${JSON.stringify(context)}
+Respond naturally and intelligently.
 `;
 
-        const recentHistory = Array.isArray(history)
-            ? history.slice(-14)
-            : [];
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
 
-        const input = [
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`
+        },
+
+        body: JSON.stringify({
+          model: "openrouter/free",
+
+          messages: [
             {
-                role: "developer",
-                content: systemPrompt
+              role: "system",
+              content: systemPrompt
             },
-            ...recentHistory.map(item => ({
-                role: item.role === "assistant" ? "assistant" : "user",
-                content: String(item.content || "")
-            })),
-            {
-                role: "user",
-                content: message
-            }
-        ];
 
-        const response = await fetch(
-            "https://api.openai.com/v1/responses",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "gpt-5.6-luna",
-                    input: input,
-                    max_output_tokens: 500
-                })
-            }
-        );
+            ...messages
+          ]
+        })
+      }
+    );
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (!response.ok) {
-            console.error("OpenAI error:", data);
+    if (!response.ok) {
+      console.error("OpenRouter error:", data);
 
-            return res.status(response.status).json({
-                error: data.error?.message || "OpenAI request failed"
-            });
-        }
-
-        return res.status(200).json({
-            response: data.output_text || "I'm having trouble responding right now."
-        });
-
-    } catch (error) {
-        console.error("Server error:", error);
-
-        return res.status(500).json({
-            error: "Something went wrong while contacting MindEase AI."
-        });
+      return res.status(response.status).json({
+        error: "AI service error",
+        details: data
+      });
     }
+
+    const reply =
+      data.choices?.[0]?.message?.content;
+
+    return res.status(200).json({
+      reply
+    });
+
+  } catch (error) {
+
+    console.error("Server error:", error);
+
+    return res.status(500).json({
+      error: "Internal server error"
+    });
+  }
 }
