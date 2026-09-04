@@ -1,12 +1,18 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>MindEase - Voice Memories</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <style>
+
 :root {
     --beige: #f5f1e8;
     --text: #2b2b2b;
@@ -14,170 +20,1913 @@
     --light: #fff;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:"Poppins",sans-serif; background:var(--beige); color:var(--text); }
+* {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body {
+    font-family:"Poppins",sans-serif;
+    background:var(--beige);
+    color:var(--text);
+}
+
+
+/* Navbar */
 
 nav {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:18px 60px; background: rgba(255,255,255,0.4);
-    backdrop-filter: blur(8px);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 60px;
+    background:rgba(255,255,255,0.4);
+    backdrop-filter:blur(8px);
 }
-.logo { font-weight:600; font-size:22px; }
-.nav-links a { margin-left:20px; text-decoration:none; color:var(--text); font-weight:500; }
-.nav-links a:hover { color:var(--accent); }
 
-header { text-align:center; padding:60px 20px; }
-header h1 { font-size:36px; margin-bottom:10px; }
-header p { font-size:18px; color:#555; }
+.logo {
+    font-weight:600;
+    font-size:22px;
+    text-decoration:none;
+    color:var(--text);
+}
 
-.container { max-width:900px; margin:0 auto; padding:20px; }
+.logo:hover {
+    color:var(--accent);
+}
+
+.nav-links a {
+    margin-left:20px;
+    text-decoration:none;
+    color:var(--text);
+    font-weight:500;
+}
+
+.nav-links a:hover {
+    color:var(--accent);
+}
+
+
+/* Header */
+
+header {
+    text-align:center;
+    padding:60px 20px;
+}
+
+header h1 {
+    font-size:36px;
+    margin-bottom:10px;
+}
+
+header p {
+    font-size:18px;
+    color:#555;
+}
+
+
+/* Main Container */
+
+.container {
+    max-width:900px;
+    margin:0 auto;
+    padding:20px;
+}
+
+
+/* Upload Section */
 
 .memory-upload {
-    display:flex; flex-direction:column; gap:15px; margin-bottom:30px;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    margin-bottom:30px;
 }
-.memory-upload input[type="file"], .memory-upload input[type="text"] {
-    padding:10px; border-radius:8px; border:1px solid #ccc;
+
+.memory-upload input[type="file"],
+.memory-upload input[type="text"] {
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-family:"Poppins",sans-serif;
 }
+
+.memory-upload input[type="text"]:focus {
+    outline:none;
+    border-color:var(--accent);
+}
+
+
+/* Buttons */
+
 .memory-upload button {
-    background:var(--accent); color:white; border:none; padding:10px 20px;
-    border-radius:25px; cursor:pointer; font-weight:600;
+    background:var(--accent);
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:25px;
+    cursor:pointer;
+    font-weight:600;
+    font-family:"Poppins",sans-serif;
 }
-.memory-upload button:hover { background:#9b886e; }
 
-#waveform { width:100%; margin-top:20px; }
-.controls { display:flex; gap:10px; margin-top:10px; }
+.memory-upload button:hover {
+    background:#9b886e;
+}
+
+.memory-upload button:disabled {
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
+
+/* Waveform */
+
+#waveform {
+    width:100%;
+    margin-top:20px;
+    min-height:100px;
+}
+
+
+/* Controls */
+
+.controls {
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+    flex-wrap:wrap;
+}
+
 .controls button {
-    background:var(--accent); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer;
+    background:var(--accent);
+    color:white;
+    border:none;
+    padding:6px 12px;
+    border-radius:15px;
+    cursor:pointer;
+    font-family:"Poppins",sans-serif;
 }
-.controls button:hover { background:#9b886e; }
 
-.memory-list { display:flex; flex-direction:column; gap:20px; }
+.controls button:hover {
+    background:#9b886e;
+}
+
+
+/* Selection Information */
+
+.selection-info {
+    font-size:14px;
+    color:#555;
+    min-height:20px;
+}
+
+
+/* Status Message */
+
+.status-message {
+    font-size:14px;
+    color:#777;
+    min-height:20px;
+}
+
+
+/* Memory List */
+
+.memory-list {
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+
+/* Memory Cards */
+
 .memory-card {
-    background:var(--light); padding:15px 20px; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.08);
-    display:flex; flex-direction:column; gap:10px;
+    background:var(--light);
+    padding:15px 20px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
 }
-.memory-card h3 { font-size:18px; }
-.memory-card audio { width:100%; outline:none; }
-.memory-card .info { display:flex; justify-content:space-between; font-size:14px; color:#555; }
-.memory-card button {
-    background:#b29b80; color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer;
-}
-.memory-card button:hover { background:#9b886e; }
 
-footer { text-align:center; padding:30px; color:#777; background:#efe8dc; margin-top:40px; }
+.memory-card h3 {
+    font-size:18px;
+}
+
+.memory-card audio {
+    width:100%;
+    outline:none;
+}
+
+.memory-card .info {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:14px;
+    color:#555;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.memory-card button {
+    background:#b29b80;
+    color:white;
+    border:none;
+    padding:6px 12px;
+    border-radius:15px;
+    cursor:pointer;
+    font-family:"Poppins",sans-serif;
+}
+
+.memory-card button:hover {
+    background:#9b886e;
+}
+
+.memory-actions {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.memory-actions button {
+    margin:0;
+}
+
+
+/* Empty State */
+
+.empty-message {
+    text-align:center;
+    color:#777;
+    padding:30px;
+    background:rgba(255,255,255,0.45);
+    border-radius:15px;
+}
+
+
+/* Footer */
+
+footer {
+    text-align:center;
+    padding:30px;
+    color:#777;
+    background:#efe8dc;
+    margin-top:40px;
+}
+
+
+/* Responsive */
+
+@media(max-width:768px){
+
+    nav {
+        padding:14px 20px;
+    }
+
+    .nav-links a {
+        margin-left:10px;
+        font-size:14px;
+    }
+
+    header h1 {
+        font-size:30px;
+    }
+
+}
 
 </style>
-<!-- Wavesurfer.js CDN -->
+
+
+<!-- Wavesurfer -->
+
 <script src="https://unpkg.com/wavesurfer.js"></script>
-<script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.regions.min.js"></script>
+<script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
+
 </head>
+
+
 <body>
 
+
+<!-- Navbar -->
+
 <nav>
-  <div class="logo">MindEase</div>
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="features.html">Features</a>
-  </div>
+
+    <a href="index.html" class="logo">
+        MindEase
+    </a>
+
+    <div class="nav-links">
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="features.html">
+            Features
+        </a>
+
+    </div>
+
 </nav>
 
+
+<!-- Header -->
+
 <header>
-    <h1>Voice Memories</h1>
-    <p>Save and cherish the voice recordings of your loved ones. Trim, name, and replay anytime!</p>
+
+    <h1>
+        Voice Memories
+    </h1>
+
+    <p>
+        Save and cherish the voice recordings of your loved ones.
+        Trim, name, and replay anytime!
+    </p>
+
 </header>
+
+
+<!-- Main -->
 
 <div class="container">
 
-<div class="memory-upload">
-    <input type="file" id="audioFile" accept="audio/*">
-    <input type="text" id="memoryName" placeholder="Enter memory name">
-    <div id="waveform"></div>
-    <div class="controls">
-        <button id="playPause">Play/Pause</button>
-        <button id="saveMemory">Save Trimmed Memory</button>
+
+    <!-- Upload -->
+
+    <div class="memory-upload">
+
+        <input
+            type="file"
+            id="audioFile"
+            accept="audio/*"
+        >
+
+
+        <input
+            type="text"
+            id="memoryName"
+            placeholder="Enter memory name"
+            maxlength="60"
+        >
+
+
+        <div id="waveform"></div>
+
+
+        <div
+            class="selection-info"
+            id="selectionInfo">
+        </div>
+
+
+        <div
+            class="status-message"
+            id="statusMessage">
+        </div>
+
+
+        <div class="controls">
+
+            <button
+                id="playPause"
+                disabled>
+
+                Play
+
+            </button>
+
+
+            <button
+                id="resetSelection"
+                disabled>
+
+                Reset Selection
+
+            </button>
+
+
+            <button
+                id="saveMemory"
+                disabled>
+
+                Save Trimmed Memory
+
+            </button>
+
+        </div>
+
     </div>
+
+
+    <!-- Saved Memories -->
+
+    <div
+        class="memory-list"
+        id="memoryList">
+
+        <!-- Saved voice memories will appear here -->
+
+    </div>
+
+
 </div>
 
-<div class="memory-list" id="memoryList">
-    <!-- Saved voice memories will appear here -->
-</div>
 
-</div>
+<!-- Footer -->
 
-<footer>© 2025 MindEase | Hackathon Project</footer>
+<footer>
+
+    © 2025 MindEase | Hackathon Project
+
+</footer>
+
+
 
 <script>
-let memories = JSON.parse(localStorage.getItem("voiceMemories") || "[]");
-const memoryList = document.getElementById("memoryList");
-displayMemories();
 
-// Wavesurfer setup
-let wavesurfer = WaveSurfer.create({
-    container: '#waveform',
-    waveColor: '#b29b80',
-    progressColor: '#9b886e',
-    height: 100,
-    responsive: true,
-    plugins: [
-        WaveSurfer.regions.create({})
-    ]
-});
+/* =====================================================
+   INDEXED DB
+===================================================== */
 
-document.getElementById("audioFile").addEventListener("change", (e)=>{
-    const file = e.target.files[0];
-    if(file){
-        wavesurfer.load(URL.createObjectURL(file));
-        wavesurfer.on('ready', ()=>{
-            // Create initial full-length region
-            wavesurfer.clearRegions();
-            wavesurfer.addRegion({start:0, end:wavesurfer.getDuration(), color:'rgba(178,155,128,0.3)'});
+const DB_NAME = "MindEaseVoiceMemories";
+
+const DB_VERSION = 1;
+
+const STORE_NAME = "memories";
+
+let db;
+
+
+/* Open database */
+
+function openDatabase(){
+
+    return new Promise((resolve,reject)=>{
+
+        const request =
+            indexedDB.open(
+                DB_NAME,
+                DB_VERSION
+            );
+
+
+        request.onupgradeneeded =
+            function(event){
+
+                const database =
+                    event.target.result;
+
+
+                if(
+                    !database.objectStoreNames.contains(
+                        STORE_NAME
+                    )
+                ){
+
+                    database.createObjectStore(
+                        STORE_NAME,
+                        {
+                            keyPath:"id",
+                            autoIncrement:true
+                        }
+                    );
+
+                }
+
+            };
+
+
+        request.onsuccess =
+            function(event){
+
+                db =
+                    event.target.result;
+
+                resolve(db);
+
+            };
+
+
+        request.onerror =
+            function(){
+
+                reject(
+                    request.error
+                );
+
+            };
+
+    });
+
+}
+
+
+/* =====================================================
+   DATABASE FUNCTIONS
+===================================================== */
+
+
+/* Save memory */
+
+function saveToDatabase(memory){
+
+    return new Promise((resolve,reject)=>{
+
+        const transaction =
+            db.transaction(
+                STORE_NAME,
+                "readwrite"
+            );
+
+        const store =
+            transaction.objectStore(
+                STORE_NAME
+            );
+
+
+        const request =
+            store.add(memory);
+
+
+        request.onsuccess =
+            function(){
+
+                resolve(
+                    request.result
+                );
+
+            };
+
+
+        request.onerror =
+            function(){
+
+                reject(
+                    request.error
+                );
+
+            };
+
+    });
+
+}
+
+
+/* Get all memories */
+
+function getMemories(){
+
+    return new Promise((resolve,reject)=>{
+
+        const transaction =
+            db.transaction(
+                STORE_NAME,
+                "readonly"
+            );
+
+        const store =
+            transaction.objectStore(
+                STORE_NAME
+            );
+
+
+        const request =
+            store.getAll();
+
+
+        request.onsuccess =
+            function(){
+
+                resolve(
+                    request.result
+                );
+
+            };
+
+
+        request.onerror =
+            function(){
+
+                reject(
+                    request.error
+                );
+
+            };
+
+    });
+
+}
+
+
+/* Delete memory */
+
+function deleteFromDatabase(id){
+
+    return new Promise((resolve,reject)=>{
+
+        const transaction =
+            db.transaction(
+                STORE_NAME,
+                "readwrite"
+            );
+
+        const store =
+            transaction.objectStore(
+                STORE_NAME
+            );
+
+
+        const request =
+            store.delete(id);
+
+
+        request.onsuccess =
+            function(){
+
+                resolve();
+
+            };
+
+
+        request.onerror =
+            function(){
+
+                reject(
+                    request.error
+                );
+
+            };
+
+    });
+
+}
+
+
+/* =====================================================
+   WAVESURFER
+===================================================== */
+
+let wavesurfer = null;
+
+let regionsPlugin = null;
+
+let selectedRegion = null;
+
+let currentAudioURL = null;
+
+
+/* Create WaveSurfer */
+
+function initializeWaveSurfer(){
+
+    regionsPlugin =
+        WaveSurfer.Regions.create();
+
+
+    wavesurfer =
+        WaveSurfer.create({
+
+            container:"#waveform",
+
+            waveColor:"#b29b80",
+
+            progressColor:"#9b886e",
+
+            cursorColor:"#555",
+
+            height:100,
+
+            responsive:true,
+
+            normalize:true,
+
+            plugins:[
+                regionsPlugin
+            ]
+
         });
+
+
+    wavesurfer.on(
+        "ready",
+        function(){
+
+            const duration =
+                wavesurfer.getDuration();
+
+
+            selectedRegion =
+                regionsPlugin.addRegion({
+
+                    start:0,
+
+                    end:duration,
+
+                    color:"rgba(178,155,128,0.3)",
+
+                    drag:true,
+
+                    resize:true
+
+                });
+
+
+            updateSelectionInfo();
+
+            document.getElementById(
+                "playPause"
+            ).disabled = false;
+
+
+            document.getElementById(
+                "resetSelection"
+            ).disabled = false;
+
+
+            document.getElementById(
+                "saveMemory"
+            ).disabled = false;
+
+
+            showStatus(
+                "Audio loaded. Drag the edges of the highlighted area to trim your memory."
+            );
+
+        });
+
+
+    wavesurfer.on(
+        "play",
+        function(){
+
+            document.getElementById(
+                "playPause"
+            ).textContent =
+                "Pause";
+
+        });
+
+
+    wavesurfer.on(
+        "pause",
+        function(){
+
+            document.getElementById(
+                "playPause"
+            ).textContent =
+                "Play";
+
+        });
+
+
+    wavesurfer.on(
+        "finish",
+        function(){
+
+            document.getElementById(
+                "playPause"
+            ).textContent =
+                "Play";
+
+        });
+
+
+    regionsPlugin.on(
+        "region-updated",
+        function(region){
+
+            selectedRegion =
+                region;
+
+            updateSelectionInfo();
+
+        });
+
+}
+
+
+/* =====================================================
+   FILE UPLOAD
+===================================================== */
+
+document
+.getElementById("audioFile")
+.addEventListener(
+    "change",
+    function(event){
+
+        const file =
+            event.target.files[0];
+
+
+        if(!file){
+
+            return;
+
+        }
+
+
+        if(!file.type.startsWith("audio/")){
+
+            showStatus(
+                "Please select a valid audio file."
+            );
+
+            return;
+
+        }
+
+
+        if(currentAudioURL){
+
+            URL.revokeObjectURL(
+                currentAudioURL
+            );
+
+        }
+
+
+        currentAudioURL =
+            URL.createObjectURL(
+                file
+            );
+
+
+        resetWaveform();
+
+
+        wavesurfer.load(
+            currentAudioURL
+        );
+
+
+        document.getElementById(
+            "memoryName"
+        ).focus();
+
     }
-});
+);
 
-document.getElementById("playPause").addEventListener("click", ()=>{
-    wavesurfer.playPause();
-});
 
-document.getElementById("saveMemory").addEventListener("click", ()=>{
-    const nameInput = document.getElementById("memoryName");
-    if(!nameInput.value.trim()){ alert("Please enter a memory name!"); return; }
-    const region = Object.values(wavesurfer.regions.list)[0];
-    if(!region){ alert("No region selected!"); return; }
+/* =====================================================
+   PLAY / PAUSE
+===================================================== */
 
-    wavesurfer.exportPCM(region.start, region.end, 44100, true).then(blobData=>{
-        const url = URL.createObjectURL(blobData);
-        memories.push({name:nameInput.value, data:url, date:new Date().toLocaleString()});
-        localStorage.setItem("voiceMemories", JSON.stringify(memories));
-        displayMemories();
-        nameInput.value=""; wavesurfer.empty();
-    });
-});
+document
+.getElementById("playPause")
+.addEventListener(
+    "click",
+    function(){
 
-// Display saved memories
-function displayMemories(){
-    memoryList.innerHTML="";
-    memories.forEach((mem,index)=>{
-        const card = document.createElement("div");
-        card.className="memory-card";
-        card.innerHTML=`
-            <h3>${mem.name}</h3>
-            <audio controls src="${mem.data}"></audio>
-            <div class="info">
-                <span>${mem.date}</span>
-                <button onclick="deleteMemory(${index})">Delete</button>
+        if(!wavesurfer){
+
+            return;
+
+        }
+
+
+        if(
+            selectedRegion &&
+            selectedRegion.start !== undefined
+        ){
+
+            selectedRegion.play();
+
+        }else{
+
+            wavesurfer.playPause();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   RESET SELECTION
+===================================================== */
+
+document
+.getElementById("resetSelection")
+.addEventListener(
+    "click",
+    function(){
+
+        if(!wavesurfer){
+
+            return;
+
+        }
+
+
+        regionsPlugin.clear();
+
+
+        selectedRegion =
+            regionsPlugin.addRegion({
+
+                start:0,
+
+                end:wavesurfer.getDuration(),
+
+                color:"rgba(178,155,128,0.3)",
+
+                drag:true,
+
+                resize:true
+
+            });
+
+
+        updateSelectionInfo();
+
+
+        showStatus(
+            "Selection reset to the full recording."
+        );
+
+    }
+);
+
+
+/* =====================================================
+   SELECTION INFORMATION
+===================================================== */
+
+function updateSelectionInfo(){
+
+    const info =
+        document.getElementById(
+            "selectionInfo"
+        );
+
+
+    if(!selectedRegion){
+
+        info.textContent =
+            "";
+
+        return;
+
+    }
+
+
+    const start =
+        formatTime(
+            selectedRegion.start
+        );
+
+
+    const end =
+        formatTime(
+            selectedRegion.end
+        );
+
+
+    const duration =
+        formatTime(
+            selectedRegion.end -
+            selectedRegion.start
+        );
+
+
+    info.textContent =
+        "Selected: " +
+        start +
+        " – " +
+        end +
+        " | Duration: " +
+        duration;
+
+}
+
+
+/* Format time */
+
+function formatTime(seconds){
+
+    if(!Number.isFinite(seconds)){
+
+        return "0:00";
+
+    }
+
+
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
+
+
+    const secs =
+        Math.floor(
+            seconds % 60
+        );
+
+
+    return (
+        minutes +
+        ":" +
+        String(secs).padStart(
+            2,
+            "0"
+        )
+    );
+
+}
+
+
+/* =====================================================
+   SAVE MEMORY
+===================================================== */
+
+document
+.getElementById("saveMemory")
+.addEventListener(
+    "click",
+    async function(){
+
+        const nameInput =
+            document.getElementById(
+                "memoryName"
+            );
+
+
+        const name =
+            nameInput.value.trim();
+
+
+        if(!name){
+
+            showStatus(
+                "Please enter a name for your voice memory."
+            );
+
+            nameInput.focus();
+
+            return;
+
+        }
+
+
+        if(!selectedRegion){
+
+            showStatus(
+                "Please select a portion of the recording first."
+            );
+
+            return;
+
+        }
+
+
+        if(!wavesurfer){
+
+            showStatus(
+                "Please upload an audio recording first."
+            );
+
+            return;
+
+        }
+
+
+        try{
+
+            showStatus(
+                "Preparing your voice memory..."
+            );
+
+
+            const blob =
+                await createTrimmedAudio(
+                    selectedRegion.start,
+                    selectedRegion.end
+                );
+
+
+            await saveToDatabase({
+
+                name:name,
+
+                audio:blob,
+
+                date:new Date().toLocaleString(),
+
+                duration:
+                    selectedRegion.end -
+                    selectedRegion.start
+
+            });
+
+
+            showStatus(
+                "Voice memory saved successfully."
+            );
+
+
+            nameInput.value = "";
+
+
+            await displayMemories();
+
+
+        }
+        catch(error){
+
+            console.error(error);
+
+            showStatus(
+                "Could not save the recording. Please try again."
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   CREATE TRIMMED AUDIO
+===================================================== */
+
+async function createTrimmedAudio(
+    startTime,
+    endTime
+){
+
+    const audioBuffer =
+        await getAudioBuffer();
+
+
+    const sampleRate =
+        audioBuffer.sampleRate;
+
+
+    const start =
+        Math.floor(
+            startTime *
+            sampleRate
+        );
+
+
+    const end =
+        Math.floor(
+            endTime *
+            sampleRate
+        );
+
+
+    const frameCount =
+        end - start;
+
+
+    const trimmedBuffer =
+        new AudioContext()
+        .createBuffer(
+            audioBuffer.numberOfChannels,
+            frameCount,
+            sampleRate
+        );
+
+
+    for(
+        let channel = 0;
+        channel < audioBuffer.numberOfChannels;
+        channel++
+    ){
+
+        const data =
+            audioBuffer
+            .getChannelData(
+                channel
+            );
+
+
+        const trimmedData =
+            trimmedBuffer
+            .getChannelData(
+                channel
+            );
+
+
+        trimmedData.set(
+            data.slice(
+                start,
+                end
+            )
+        );
+
+    }
+
+
+    return audioBufferToWav(
+        trimmedBuffer
+    );
+
+}
+
+
+/* =====================================================
+   GET ORIGINAL AUDIO BUFFER
+===================================================== */
+
+async function getAudioBuffer(){
+
+    const response =
+        await fetch(
+            currentAudioURL
+        );
+
+
+    const arrayBuffer =
+        await response.arrayBuffer();
+
+
+    const audioContext =
+        new AudioContext();
+
+
+    const audioBuffer =
+        await audioContext.decodeAudioData(
+            arrayBuffer
+        );
+
+
+    await audioContext.close();
+
+
+    return audioBuffer;
+
+}
+
+
+/* =====================================================
+   CONVERT AUDIO BUFFER TO WAV
+===================================================== */
+
+function audioBufferToWav(buffer){
+
+    const numberOfChannels =
+        buffer.numberOfChannels;
+
+
+    const sampleRate =
+        buffer.sampleRate;
+
+
+    const format = 1;
+
+
+    const bitDepth = 16;
+
+
+    const channelData = [];
+
+
+    for(
+        let channel = 0;
+        channel < numberOfChannels;
+        channel++
+    ){
+
+        channelData.push(
+            buffer.getChannelData(
+                channel
+            )
+        );
+
+    }
+
+
+    const dataLength =
+        channelData[0].length *
+        numberOfChannels *
+        2;
+
+
+    const arrayBuffer =
+        new ArrayBuffer(
+            44 + dataLength
+        );
+
+
+    const view =
+        new DataView(
+            arrayBuffer
+        );
+
+
+    writeString(
+        view,
+        0,
+        "RIFF"
+    );
+
+
+    view.setUint32(
+        4,
+        36 + dataLength,
+        true
+    );
+
+
+    writeString(
+        view,
+        8,
+        "WAVE"
+    );
+
+
+    writeString(
+        view,
+        12,
+        "fmt "
+    );
+
+
+    view.setUint32(
+        16,
+        16,
+        true
+    );
+
+
+    view.setUint16(
+        20,
+        format,
+        true
+    );
+
+
+    view.setUint16(
+        22,
+        numberOfChannels,
+        true
+    );
+
+
+    view.setUint32(
+        24,
+        sampleRate,
+        true
+    );
+
+
+    view.setUint32(
+        28,
+        sampleRate *
+        numberOfChannels *
+        2,
+        true
+    );
+
+
+    view.setUint16(
+        32,
+        numberOfChannels * 2,
+        true
+    );
+
+
+    view.setUint16(
+        34,
+        bitDepth,
+        true
+    );
+
+
+    writeString(
+        view,
+        36,
+        "data"
+    );
+
+
+    view.setUint32(
+        40,
+        dataLength,
+        true
+    );
+
+
+    let offset = 44;
+
+
+    for(
+        let i = 0;
+        i < channelData[0].length;
+        i++
+    ){
+
+        for(
+            let channel = 0;
+            channel < numberOfChannels;
+            channel++
+        ){
+
+            let sample =
+                channelData[channel][i];
+
+
+            sample =
+                Math.max(
+                    -1,
+                    Math.min(
+                        1,
+                        sample
+                    )
+                );
+
+
+            sample =
+                sample < 0
+                ? sample * 0x8000
+                : sample * 0x7FFF;
+
+
+            view.setInt16(
+                offset,
+                sample,
+                true
+            );
+
+
+            offset += 2;
+
+        }
+
+    }
+
+
+    return new Blob(
+        [arrayBuffer],
+        {
+            type:"audio/wav"
+        }
+    );
+
+}
+
+
+/* Write WAV strings */
+
+function writeString(
+    view,
+    offset,
+    string
+){
+
+    for(
+        let i = 0;
+        i < string.length;
+        i++
+    ){
+
+        view.setUint8(
+            offset + i,
+            string.charCodeAt(i)
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   DISPLAY SAVED MEMORIES
+===================================================== */
+
+async function displayMemories(){
+
+    const memoryList =
+        document.getElementById(
+            "memoryList"
+        );
+
+
+    const memories =
+        await getMemories();
+
+
+    memoryList.innerHTML = "";
+
+
+    if(memories.length === 0){
+
+        memoryList.innerHTML = `
+
+            <div class="empty-message">
+
+                No voice memories saved yet.
+                Upload a recording above to create your first memory.
+
             </div>
+
         `;
-        memoryList.appendChild(card);
-    });
+
+        return;
+
+    }
+
+
+    memories
+    .sort(
+        (a,b) =>
+            b.id - a.id
+    )
+    .forEach(
+        function(memory){
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "memory-card";
+
+
+            const audioURL =
+                URL.createObjectURL(
+                    memory.audio
+                );
+
+
+            card.innerHTML = `
+
+                <h3>
+                    ${escapeHTML(memory.name)}
+                </h3>
+
+                <audio
+                    controls
+                    src="${audioURL}">
+                </audio>
+
+                <div class="info">
+
+                    <span>
+                        ${escapeHTML(memory.date)}
+                    </span>
+
+                    <span>
+                        ${formatTime(memory.duration)}
+                    </span>
+
+                </div>
+
+                <div class="memory-actions">
+
+                    <button
+                        onclick="renameMemory(${memory.id})">
+
+                        Rename
+
+                    </button>
+
+                    <button
+                        onclick="deleteMemory(${memory.id})">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            `;
+
+
+            const audio =
+                card.querySelector(
+                    "audio"
+                );
+
+
+            audio.addEventListener(
+                "play",
+                function(){
+
+                    stopOtherAudio(
+                        audio
+                    );
+
+                }
+            );
+
+
+            memoryList.appendChild(
+                card
+            );
+
+        }
+    );
+
 }
 
-function deleteMemory(index){
-    memories.splice(index,1);
-    localStorage.setItem("voiceMemories", JSON.stringify(memories));
-    displayMemories();
+
+/* =====================================================
+   STOP OTHER MEMORY AUDIO
+===================================================== */
+
+function stopOtherAudio(currentAudio){
+
+    document
+    .querySelectorAll(
+        ".memory-card audio"
+    )
+    .forEach(
+        function(audio){
+
+            if(
+                audio !== currentAudio
+            ){
+
+                audio.pause();
+
+            }
+
+        }
+    );
+
 }
+
+
+/* =====================================================
+   RENAME MEMORY
+===================================================== */
+
+async function renameMemory(id){
+
+    const memories =
+        await getMemories();
+
+
+    const memory =
+        memories.find(
+            item =>
+                item.id === id
+        );
+
+
+    if(!memory){
+
+        return;
+
+    }
+
+
+    const newName =
+        prompt(
+            "Enter a new name:",
+            memory.name
+        );
+
+
+    if(
+        !newName ||
+        !newName.trim()
+    ){
+
+        return;
+
+    }
+
+
+    const transaction =
+        db.transaction(
+            STORE_NAME,
+            "readwrite"
+        );
+
+
+    const store =
+        transaction.objectStore(
+            STORE_NAME
+        );
+
+
+    memory.name =
+        newName.trim();
+
+
+    store.put(
+        memory
+    );
+
+
+    transaction.oncomplete =
+        function(){
+
+            displayMemories();
+
+        };
+
+}
+
+
+/* =====================================================
+   DELETE MEMORY
+===================================================== */
+
+async function deleteMemory(id){
+
+    const memories =
+        await getMemories();
+
+
+    const memory =
+        memories.find(
+            item =>
+                item.id === id
+        );
+
+
+    if(!memory){
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "Delete \"" +
+            memory.name +
+            "\"?"
+        );
+
+
+    if(!confirmed){
+
+        return;
+
+    }
+
+
+    try{
+
+        await deleteFromDatabase(
+            id
+        );
+
+
+        await displayMemories();
+
+
+        showStatus(
+            "Voice memory deleted."
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showStatus(
+            "Could not delete the memory."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   RESET WAVEFORM
+===================================================== */
+
+function resetWaveform(){
+
+    if(!wavesurfer){
+
+        return;
+
+    }
+
+
+    regionsPlugin.clear();
+
+
+    selectedRegion =
+        null;
+
+
+    document.getElementById(
+        "selectionInfo"
+    ).textContent = "";
+
+
+    document.getElementById(
+        "playPause"
+    ).disabled = true;
+
+
+    document.getElementById(
+        "resetSelection"
+    ).disabled = true;
+
+
+    document.getElementById(
+        "saveMemory"
+    ).disabled = true;
+
+}
+
+
+/* =====================================================
+   STATUS MESSAGE
+===================================================== */
+
+function showStatus(message){
+
+    document.getElementById(
+        "statusMessage"
+    ).textContent =
+        message;
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value){
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        value;
+
+
+    return div.innerHTML;
+
+}
+
+
+/* =====================================================
+   INITIALIZATION
+===================================================== */
+
+async function initialize(){
+
+    try{
+
+        await openDatabase();
+
+        initializeWaveSurfer();
+
+        await displayMemories();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showStatus(
+            "Voice memory storage could not be initialized."
+        );
+
+    }
+
+}
+
+
+initialize();
+
+
+/* =====================================================
+   CLEANUP
+===================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        if(currentAudioURL){
+
+            URL.revokeObjectURL(
+                currentAudioURL
+            );
+
+        }
+
+    }
+);
+
 </script>
+
 
 </body>
 </html>
+```
